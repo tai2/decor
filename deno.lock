@@ -1,19 +1,6 @@
 {
   "version": "2",
   "remote": {
-    "https://cdn.jsdelivr.net/npm/marked/lib/marked.esm.js": "5985c9db0bdc92b678a8a3451106485341e06bb2ff12e8863b568d6307553fb6",
-    "https://deno.land/x/marked@1.0.2/mod.ts": "57e4fd38be13ae9efd001704eea481570fce83fe502f4fb64aba140fd7fd75cb",
-    "https://raw.githubusercontent.com/markedjs/marked/master/src/Hooks.ts": "0cd271de88bfc0bbfde040f978114d337c69c477491c4c731c8f491b9533d086",
-    "https://raw.githubusercontent.com/markedjs/marked/master/src/Instance.ts": "8acaa748e31c72fdebde6700d288b2fea32dac386f871874447356bf9b9e7fc6",
-    "https://raw.githubusercontent.com/markedjs/marked/master/src/Lexer.ts": "c726234547c7320a2db169f41ebaf75273cb7efc87a9c681b676f84b9a48a047",
-    "https://raw.githubusercontent.com/markedjs/marked/master/src/Parser.ts": "eb03f9839b367f7757a0c4a1e0946cdeb96f7d172e16823a6e82dbb69492272c",
-    "https://raw.githubusercontent.com/markedjs/marked/master/src/Renderer.ts": "c677746e994ad63db9d8c03cb8d601cd6d6282b7136031f14c39a516f2bb39df",
-    "https://raw.githubusercontent.com/markedjs/marked/master/src/TextRenderer.ts": "0c3300738e651fdaf4046959269f4b254248343afba045f8d963f93b05e44081",
-    "https://raw.githubusercontent.com/markedjs/marked/master/src/Tokenizer.ts": "9d28ca154b59a4fdb402c655510ec6c44910abb827e36fbb21f237f669224e30",
-    "https://raw.githubusercontent.com/markedjs/marked/master/src/defaults.ts": "b4f86abcab528d16d686a849683c419b02ba9f4dd00ff1d22ea3e9142dbd3188",
-    "https://raw.githubusercontent.com/markedjs/marked/master/src/helpers.ts": "6b8303bd390a2217119fdf23c52cd0d4013bbff73aabb030a435e9958d6018e5",
-    "https://raw.githubusercontent.com/markedjs/marked/master/src/marked.ts": "c026156520ea36ce9e270659acf36b614984e4b1052813c1051918f29efa8521",
-    "https://raw.githubusercontent.com/markedjs/marked/master/src/rules.ts": "8c95a52976b4ace9bceeea739afe08b46f00ff1f4e62831ca2eb686dab5b2fad",
     "https://raw.githubusercontent.com/markedjs/marked/v9.0.0/src/Hooks.ts": "0cd271de88bfc0bbfde040f978114d337c69c477491c4c731c8f491b9533d086",
     "https://raw.githubusercontent.com/markedjs/marked/v9.0.0/src/Instance.ts": "8acaa748e31c72fdebde6700d288b2fea32dac386f871874447356bf9b9e7fc6",
     "https://raw.githubusercontent.com/markedjs/marked/v9.0.0/src/Lexer.ts": "c726234547c7320a2db169f41ebaf75273cb7efc87a9c681b676f84b9a48a047",
@@ -27,16 +14,5 @@
     "https://raw.githubusercontent.com/markedjs/marked/v9.0.0/src/helpers.ts": "6b8303bd390a2217119fdf23c52cd0d4013bbff73aabb030a435e9958d6018e5",
     "https://raw.githubusercontent.com/markedjs/marked/v9.0.0/src/marked.ts": "c026156520ea36ce9e270659acf36b614984e4b1052813c1051918f29efa8521",
     "https://raw.githubusercontent.com/markedjs/marked/v9.0.0/src/rules.ts": "8c95a52976b4ace9bceeea739afe08b46f00ff1f4e62831ca2eb686dab5b2fad"
-  },
-  "npm": {
-    "specifiers": {
-      "marked": "marked@9.0.0"
-    },
-    "packages": {
-      "marked@9.0.0": {
-        "integrity": "sha512-37yoTpjU+TSXb9OBYY5n78z/CqXh76KiQj9xsKxEdztzU9fRLmbWO5YqKxgCVGKlNdexppnbKTkwB3RipVri8w==",
-        "dependencies": {}
-      }
-    }
   }
 }

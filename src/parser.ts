@@ -1,16 +1,14 @@
 import { Renderer } from "./renderer.ts";
-import { _TextRenderer, _defaults, unescape } from "./marked.ts";
-import type { Token, Tokens, MarkedOptions } from "./marked.ts";
+import { _TextRenderer, unescape } from "./marked.ts";
+import type { Token, Tokens } from "./marked.ts";
 
 /**
  * Parsing & Compiling
  */
 export class _Parser {
-  options: MarkedOptions;
   renderer: Renderer;
   textRenderer: _TextRenderer;
-  constructor(renderer: Renderer, options?: MarkedOptions) {
-    this.options = options || _defaults;
+  constructor(renderer: Renderer) {
     this.renderer = renderer;
     this.textRenderer = new _TextRenderer();
   }
@@ -18,20 +16,16 @@ export class _Parser {
   /**
    * Static Parse Method
    */
-  static parse(renderer: Renderer, tokens: Token[], options?: MarkedOptions) {
-    const parser = new _Parser(renderer, options);
+  static parse(renderer: Renderer, tokens: Token[]) {
+    const parser = new _Parser(renderer);
     return parser.parse(tokens);
   }
 
   /**
    * Static Parse Inline Method
    */
-  static parseInline(
-    renderer: Renderer,
-    tokens: Token[],
-    options?: MarkedOptions
-  ) {
-    const parser = new _Parser(renderer, options);
+  static parseInline(renderer: Renderer, tokens: Token[]) {
+    const parser = new _Parser(renderer);
     return parser.parseInline(tokens);
   }
 
@@ -185,12 +179,7 @@ export class _Parser {
 
         default: {
           const errMsg = 'Token with "' + token.type + '" type was not found.';
-          if (this.options.silent) {
-            console.error(errMsg);
-            return "";
-          } else {
-            throw new Error(errMsg);
-          }
+          throw new Error(errMsg);
         }
       }
     }
@@ -270,12 +259,7 @@ export class _Parser {
         }
         default: {
           const errMsg = 'Token with "' + token.type + '" type was not found.';
-          if (this.options.silent) {
-            console.error(errMsg);
-            return "";
-          } else {
-            throw new Error(errMsg);
-          }
+          throw new Error(errMsg);
         }
       }
     }
