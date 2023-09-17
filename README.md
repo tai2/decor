@@ -41,12 +41,15 @@ Template is just a normal HTML file and has two responsibilities:
 | `paragraph`                                                 | `content`                     |
 | `code_block`                                                | `content`                     |
 | `block_quote`                                               | `content`                     |
-| `table`                                                     | `content`                     |
+| `table`                                                     | `header`, `body`              |
+| `table_header`                                              | `content`                     |
+| `table_header_cell`                                         | `content`, `align`            |
 | `table_row`                                                 | `content`                     |
-| `table_row_cell`                                            | `content`                     |
+| `table_row_cell`                                            | `content`, `align`            |
 | `ordered_list`                                              | `content`                     |
+| `ordered_list_item`                                         | `content`                     |
 | `unordered_list`                                            | `content`                     |
-| `list_item`                                                 | `content`                     |
+| `unordered_list_item`                                       | `content`                     |
 | `link`                                                      | `content`, `title`, `url`     |
 | `image`                                                     | `description`, `title`, `url` |
 | `video` (when video file is referenced with image notation) | `description`, `title`, `url` |
