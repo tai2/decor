@@ -14,7 +14,7 @@ function testRenderer(): Renderer {
     heading: () => "",
     hr: () => "",
     list: () => "",
-    listitem: () => "",
+    listitem: (text) => text,
     checkbox: () => "",
     paragraph: (text) => text,
     table: () => "",
@@ -91,3 +91,28 @@ Deno.test("`hr` callback receives arguments ()", () => {
     args: [],
   });
 });
+
+Deno.test("`list` callback receives arguments (body, ordered, start)", () => {
+  const renderer = testRenderer();
+  const listSpy = spy(renderer, "list");
+
+  Parser.parse(renderer, marked.lexer("1. Hello, World!"));
+
+  assertSpyCall(listSpy, 0, {
+    args: ["Hello, World!", true, 1],
+  });
+});
+
+Deno.test(
+  "`listitem` callback receives arguments (text, ordered, task, checked)",
+  () => {
+    const renderer = testRenderer();
+    const listitemSpy = spy(renderer, "listitem");
+
+    Parser.parse(renderer, marked.lexer("* Hello, World!"));
+
+    assertSpyCall(listitemSpy, 0, {
+      args: ["Hello, World!", false, false, false],
+    });
+  }
+);
