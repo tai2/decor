@@ -18,8 +18,8 @@ function testRenderer(): Renderer {
     checkbox: () => "",
     paragraph: (text) => text,
     table: () => "",
-    tablerow: () => "",
-    tablecell: () => "",
+    tablerow: (content) => content,
+    tablecell: (content) => content,
     strong: () => "",
     em: () => "",
     codespan: () => "",
@@ -136,5 +136,16 @@ Deno.test("`paragraph` callback receives arguments (text)", () => {
 
   assertSpyCall(paragraphSpy, 0, {
     args: ["Hello, World!"],
+  });
+});
+
+Deno.test("`table` callback receives arguments (header, body)", () => {
+  const renderer = testRenderer();
+  const tableSpy = spy(renderer, "table");
+
+  Parser.parse(renderer, marked.lexer("| Header |\n ----- |\n Body |"));
+
+  assertSpyCall(tableSpy, 0, {
+    args: ["Header", "Body"],
   });
 });
