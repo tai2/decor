@@ -179,3 +179,14 @@ Deno.test("`tablecell` callback receives arguments (content, flags)", () => {
     args: ["Body", { header: false, align: null }],
   });
 });
+
+Deno.test("`strong` callback receives arguments (text)", () => {
+  const renderer = testRenderer();
+  const strongSpy = spy(renderer, "strong");
+
+  Parser.parse(renderer, marked.lexer("**Hello, World!**"));
+
+  assertSpyCall(strongSpy, 0, {
+    args: ["Hello, World!"],
+  });
+});
