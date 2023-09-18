@@ -164,3 +164,18 @@ Deno.test("`tablerow` callback receives arguments (content, flags)", () => {
     args: ["Body", { header: false }],
   });
 });
+
+Deno.test("`tablecell` callback receives arguments (content, flags)", () => {
+  const renderer = testRenderer();
+  const tablecellSpy = spy(renderer, "tablecell");
+
+  Parser.parse(renderer, marked.lexer("| Header |\n ----- |\n Body |"));
+
+  assertSpyCall(tablecellSpy, 0, {
+    args: ["Header", { header: true, align: null }],
+  });
+
+  assertSpyCall(tablecellSpy, 1, {
+    args: ["Body", { header: false, align: null }],
+  });
+});
