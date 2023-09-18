@@ -80,3 +80,14 @@ Deno.test("`headding` callback receives arguments (text, level, raw)", () => {
     args: ["Headding", 1, "Headding"],
   });
 });
+
+Deno.test("`hr` callback receives arguments ()", () => {
+  const renderer = testRenderer();
+  const hrSpy = spy(renderer, "hr");
+
+  Parser.parse(renderer, marked.lexer("-----"));
+
+  assertSpyCall(hrSpy, 0, {
+    args: [],
+  });
+});
