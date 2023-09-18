@@ -127,3 +127,14 @@ Deno.test("`checkebox` callback receives arguments (checked)", () => {
     args: [true],
   });
 });
+
+Deno.test("`paragraph` callback receives arguments (text)", () => {
+  const renderer = testRenderer();
+  const paragraphSpy = spy(renderer, "paragraph");
+
+  Parser.parse(renderer, marked.lexer("Hello, World!"));
+
+  assertSpyCall(paragraphSpy, 0, {
+    args: ["Hello, World!"],
+  });
+});
