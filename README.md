@@ -20,7 +20,7 @@ Then it generates `content.html`. The rules for templates are described in the f
 
 - `--template` Template file. If omitted, the default template is used.
 - `--watch` Run `decor` in watch mode. It detects updates for template and contents then emits outputs.
-- `--output` Output filename. When ommited, the input file name with the extension part replaced with `.md` is used.
+- `--output` Output filename. When omitted, the input file name with the extension part replaced with `.md` is used.
 - `--generate-template` Emit the default template to a file. You can use it as a starting point of your own template.
 
 # Template Structure
@@ -187,7 +187,7 @@ If these attributes are not specified, `decor` suposes the default mappings are 
 # Reviewing Template
 
 Since template is just a plain HTML, you can write and review it as you want.
-When contents are ommited, the default content included in `decor` is used. It's useful when you want to review your stylesheets but you don't need to define the whole element definitions in your template.
+When contents are omitted, the default content included in `decor` is used. It's useful when you want to review your stylesheets but you don't need to define the whole element definitions in your template.
 
 # Reference
 
