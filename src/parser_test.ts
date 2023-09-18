@@ -116,3 +116,14 @@ Deno.test(
     });
   }
 );
+
+Deno.test("`checkebox` callback receives arguments (checked)", () => {
+  const renderer = testRenderer();
+  const checkboxSpy = spy(renderer, "checkbox");
+
+  Parser.parse(renderer, marked.lexer("- [x] Hello, World!"));
+
+  assertSpyCall(checkboxSpy, 0, {
+    args: [true],
+  });
+});
