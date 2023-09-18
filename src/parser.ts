@@ -5,7 +5,7 @@ import type { Token, Tokens } from "./marked.ts";
 /**
  * Parsing & Compiling
  */
-export class _Parser {
+export class Parser {
   renderer: Renderer;
   textRenderer: _TextRenderer;
   constructor(renderer: Renderer) {
@@ -17,7 +17,7 @@ export class _Parser {
    * Static Parse Method
    */
   static parse(renderer: Renderer, tokens: Token[]) {
-    const parser = new _Parser(renderer);
+    const parser = new Parser(renderer);
     return parser.parse(tokens);
   }
 
@@ -25,7 +25,7 @@ export class _Parser {
    * Static Parse Inline Method
    */
   static parseInline(renderer: Renderer, tokens: Token[]) {
-    const parser = new _Parser(renderer);
+    const parser = new Parser(renderer);
     return parser.parseInline(tokens);
   }
 
