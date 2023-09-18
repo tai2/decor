@@ -190,3 +190,14 @@ Deno.test("`strong` callback receives arguments (text)", () => {
     args: ["Hello, World!"],
   });
 });
+
+Deno.test("`em` callback receives arguments (text)", () => {
+  const renderer = testRenderer();
+  const emSpy = spy(renderer, "em");
+
+  Parser.parse(renderer, marked.lexer("*Hello, World!*"));
+
+  assertSpyCall(emSpy, 0, {
+    args: ["Hello, World!"],
+  });
+});
