@@ -223,3 +223,14 @@ Deno.test("`br` callback receives arguments ()", () => {
     args: [],
   });
 });
+
+Deno.test("`del` callback receives arguments (text)", () => {
+  const renderer = testRenderer();
+  const delSpy = spy(renderer, "del");
+
+  Parser.parse(renderer, marked.lexer("~~Hello, World!~~"));
+
+  assertSpyCall(delSpy, 0, {
+    args: ["Hello, World!"],
+  });
+});
