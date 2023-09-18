@@ -234,3 +234,17 @@ Deno.test("`del` callback receives arguments (text)", () => {
     args: ["Hello, World!"],
   });
 });
+
+Deno.test("`link` callback receives arguments (href, title, text)", () => {
+  const renderer = testRenderer();
+  const linkSpy = spy(renderer, "link");
+
+  Parser.parse(
+    renderer,
+    marked.lexer('[Hello, World!](https://example.com "title")')
+  );
+
+  assertSpyCall(linkSpy, 0, {
+    args: ["https://example.com", "title", "Hello, World!"],
+  });
+});
