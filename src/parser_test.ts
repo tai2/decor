@@ -31,7 +31,24 @@ function testRenderer(): Renderer {
   };
 }
 
-Deno.test("Headding callback receives arguments (text, level, raw)", () => {
+Deno.test(
+  "`code` callback receives arguments (code, infostring, escaped)",
+  () => {
+    const renderer = testRenderer();
+    const codeSpy = spy(renderer, "code");
+
+    Parser.parse(
+      renderer,
+      marked.lexer("```js\nconsole.log('Hello, World!');\n```")
+    );
+
+    assertSpyCall(codeSpy, 0, {
+      args: ["console.log('Hello, World!');", "js", false],
+    });
+  }
+);
+
+Deno.test("`headding` callback receives arguments (text, level, raw)", () => {
   const renderer = testRenderer();
   const headingSpy = spy(renderer, "heading");
 
