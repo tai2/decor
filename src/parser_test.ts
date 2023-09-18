@@ -16,7 +16,7 @@ function testRenderer(): Renderer {
     list: () => "",
     listitem: () => "",
     checkbox: () => "",
-    paragraph: () => "",
+    paragraph: (text) => text,
     table: () => "",
     tablerow: () => "",
     tablecell: () => "",
@@ -47,6 +47,17 @@ Deno.test(
     });
   }
 );
+
+Deno.test("`blockqote` callback receives arguments (quote)", () => {
+  const renderer = testRenderer();
+  const blockquoteSpy = spy(renderer, "blockquote");
+
+  Parser.parse(renderer, marked.lexer("> Hello, World!"));
+
+  assertSpyCall(blockquoteSpy, 0, {
+    args: ["Hello, World!"],
+  });
+});
 
 Deno.test("`headding` callback receives arguments (text, level, raw)", () => {
   const renderer = testRenderer();
