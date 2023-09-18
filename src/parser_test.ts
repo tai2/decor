@@ -59,6 +59,17 @@ Deno.test("`blockqote` callback receives arguments (quote)", () => {
   });
 });
 
+Deno.test("`html` callback receives arguments (html, block)", () => {
+  const renderer = testRenderer();
+  const htmlSpy = spy(renderer, "html");
+
+  Parser.parse(renderer, marked.lexer("<p>Hello, World!</p>"));
+
+  assertSpyCall(htmlSpy, 0, {
+    args: ["<p>Hello, World!</p>", true],
+  });
+});
+
 Deno.test("`headding` callback receives arguments (text, level, raw)", () => {
   const renderer = testRenderer();
   const headingSpy = spy(renderer, "heading");
