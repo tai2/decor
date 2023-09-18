@@ -262,3 +262,14 @@ Deno.test("`image` callback receives arguments (href, title, text)", () => {
     args: ["https://example.com/image.jpg", "title", "Hello, World!"],
   });
 });
+
+Deno.test("`text` callback receives arguments (text)", () => {
+  const renderer = testRenderer();
+  const textSpy = spy(renderer, "text");
+
+  Parser.parse(renderer, marked.lexer("Hello, World!"));
+
+  assertSpyCall(textSpy, 0, {
+    args: ["Hello, World!"],
+  });
+});
