@@ -201,3 +201,14 @@ Deno.test("`em` callback receives arguments (text)", () => {
     args: ["Hello, World!"],
   });
 });
+
+Deno.test("`codespan` callback receives arguments (code)", () => {
+  const renderer = testRenderer();
+  const codespanSpy = spy(renderer, "codespan");
+
+  Parser.parse(renderer, marked.lexer("`Hello, World!`"));
+
+  assertSpyCall(codespanSpy, 0, {
+    args: ["Hello, World!"],
+  });
+});
