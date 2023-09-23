@@ -1,0 +1,1 @@
+{"defaultHtml":"<!DOCTYPE html>\n<html>\n  <head>\n    <meta charset=\"UTF-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n  </head>\n  <body>\n    <h1 data-decor-element=\"headding1\">Primary Headding</h1>\n    <h2 data-decor-element=\"headding2\">Secondary Headding</h2>\n  </body>\n</html>\n"}
