@@ -1,8 +1,8 @@
 # What's decor?
 
 `decor` is a Markdown transformer which takes Markdown files as contents and a
-standalone HTML file as a template. It is designed for rather a oneshot single
-page use than a fullset static site generation.
+standalone HTML file as a template. It is designed for rather oneshot single
+page use than fullset static site generation.
 
 # Installation
 
