@@ -113,3 +113,21 @@ console.log("Hello, World!");
     );
   }
 );
+
+Deno.test("`templateRenderer.blockquote` renders received parameters", () => {
+  const document = new DOMParser().parseFromString(
+    `<blockquote data-decor-content="content">
+The quick brown fox jumps over the lazy dog
+</blockquote>`,
+    "text/html"
+  )!;
+  const blockQuoteTemplate = document.body.children[0];
+
+  assertEquals(
+    templateRenderer({
+      ...testTemplate,
+      blockQuote: blockQuoteTemplate,
+    }).blockquote("Sphinx of black quartz, judge my vow."),
+    `<blockquote data-decor-content="content">Sphinx of black quartz, judge my vow.</blockquote>`
+  );
+});

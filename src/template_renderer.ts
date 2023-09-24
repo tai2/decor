@@ -71,6 +71,65 @@ export function templateRenderer(template: Template): Renderer {
     return attributeKeys;
   }
 
+  function replaceContents(
+    template: Element,
+    parameters: Record<string, string | undefined>
+  ) {
+    const contentContainers = template.querySelectorAll("[data-decor-content]");
+    for (const contentContainer of contentContainers) {
+      const container = contentContainer as Element;
+      const parameterName = container.getAttribute("data-decor-content");
+      if (parameterName && parameters[parameterName]) {
+        container.textContent = parameters[parameterName]!;
+      }
+    }
+    // When there is no content specifier, decor apply it to the root element.
+    if (contentContainers.length === 0) {
+      template.textContent = parameters["content"]!;
+    }
+  }
+
+  function addAttributes(
+    template: Element,
+    parameters: Record<string, string | undefined>,
+    expectedParameters: Record<
+      string,
+      { defaultAttribute: string; isReferenced: boolean }
+    >
+  ) {
+    const attributeKeys = getAttributeKeysFromCache("codeBlock");
+    for (const attributeKey of attributeKeys) {
+      const destinaionAttribute = attributeKey.substring(
+        "data-decor-attribute-".length
+      );
+      const attributeContainers = template.querySelectorAll(
+        `[${attributeKey}]`
+      );
+      for (const attributeContainer of attributeContainers) {
+        const container = attributeContainer as Element;
+        const parameterKey = container.getAttribute(attributeKey);
+        if (parameterKey && expectedParameters[parameterKey]) {
+          expectedParameters[parameterKey].isReferenced = true;
+          if (parameters[parameterKey]) {
+            container.setAttribute(
+              destinaionAttribute,
+              parameters[parameterKey]
+            );
+          }
+        }
+      }
+    }
+    // When expected parameter is not consumed by any attribute, decor apply it to the root element.
+    for (const [
+      parameterKey,
+      { defaultAttribute, isReferenced },
+    ] of Object.entries(expectedParameters)) {
+      if (!isReferenced) {
+        template.setAttribute(defaultAttribute, parameters[parameterKey]);
+      }
+    }
+  }
+
   return {
     code: (
       code: string,
@@ -87,64 +146,34 @@ export function templateRenderer(template: Template): Renderer {
 
       const codeBlockTemplate = template.codeBlock.cloneNode(true) as Element;
 
-      const contentContainers = codeBlockTemplate.querySelectorAll(
-        "[data-decor-content]"
-      );
-      for (const contentContainer of contentContainers) {
-        const container = contentContainer as Element;
-        const parameterName = container.getAttribute("data-decor-content");
-        if (parameterName && parameters[parameterName]) {
-          container.textContent = parameters[parameterName]!;
-        }
-      }
-      // When there is no content specifier, decor apply it to the root element.
-      if (contentContainers.length === 0) {
-        codeBlockTemplate.textContent = parameters["content"]!;
-      }
+      replaceContents(codeBlockTemplate, parameters);
 
       const expectedParameters: Record<
         string,
-        { attribute: string; isReferenced: boolean }
+        { defaultAttribute: string; isReferenced: boolean }
       > = {
         infoString: {
-          attribute: "data-language",
+          defaultAttribute: "data-language",
           isReferenced: false,
         },
       };
-      const attributeKeys = getAttributeKeysFromCache("codeBlock");
-      for (const attributeKey of attributeKeys) {
-        const destinaionAttribute = attributeKey.substring(
-          "data-decor-attribute-".length
-        );
-        const attributeContainers = codeBlockTemplate.querySelectorAll(
-          `[${attributeKey}]`
-        );
-        for (const attributeContainer of attributeContainers) {
-          const container = attributeContainer as Element;
-          const parameterKey = container.getAttribute(attributeKey);
-          if (parameterKey && expectedParameters[parameterKey]) {
-            expectedParameters[parameterKey].isReferenced = true;
-            if (parameters[parameterKey]) {
-              container.setAttribute(
-                destinaionAttribute,
-                parameters[parameterKey]
-              );
-            }
-          }
-        }
-      }
-      // When parameter is not consumed by any attribute, decor apply it to the root element.
-      for (const [parameterKey, { attribute, isReferenced }] of Object.entries(
-        expectedParameters
-      )) {
-        if (!isReferenced) {
-          codeBlockTemplate.setAttribute(attribute, parameters[parameterKey]);
-        }
-      }
+      addAttributes(codeBlockTemplate, parameters, expectedParameters);
 
       return codeBlockTemplate.outerHTML;
     },
-    blockquote: () => "",
+    blockquote: (quote: string) => {
+      const parameters: Record<string, string | undefined> = {
+        content: quote,
+      };
+
+      const blockQuoteTemplate = template.blockQuote.cloneNode(true) as Element;
+
+      replaceContents(blockQuoteTemplate, parameters);
+
+      addAttributes(blockQuoteTemplate, parameters, {});
+
+      return blockQuoteTemplate.outerHTML;
+    },
     html: () => "",
     heading: () => "",
     hr: () => "",
