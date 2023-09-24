@@ -107,7 +107,7 @@ export function templateRenderer(template: Template): Renderer {
         { attribute: string; isReferenced: boolean }
       > = {
         infoString: {
-          attribute: "data-lanauge",
+          attribute: "data-language",
           isReferenced: false,
         },
       };

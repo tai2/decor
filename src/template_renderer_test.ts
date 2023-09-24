@@ -88,3 +88,28 @@ console.log("Hello, World!");
 </pre>`
   );
 });
+
+Deno.test(
+  "`templateRenderer.code` renders received parameters to the root element when no specifier found",
+  () => {
+    const document = new DOMParser().parseFromString(
+      `<pre>
+<code>
+console.log("Hello, World!");
+</code>
+</pre>`,
+      "text/html"
+    )!;
+    const codeBlockTemplate = document.body.children[0];
+
+    assertEquals(
+      templateRenderer({ ...testTemplate, codeBlock: codeBlockTemplate }).code(
+        'alert("Hello, World!");',
+        "javascript",
+        false
+      ),
+      `<pre data-language="javascript">alert(&amp;quot;Hello, World!&amp;quot;);
+</pre>`
+    );
+  }
+);
