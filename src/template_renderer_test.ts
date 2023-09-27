@@ -154,3 +154,39 @@ The quick brown fox jumps over the lazy dog.
     );
   }
 );
+
+Deno.test("`templateRenderer.link` renders received parameters", () => {
+  const document = new DOMParser().parseFromString(
+    `<a href data-decor-attribute-href="url" data-decor-attribute-title="title" data-decor-content="content">
+example
+</a>`,
+    "text/html"
+  )!;
+  const linkTemplate = document.body.children[0];
+
+  assertEquals(
+    templateRenderer({
+      ...testTemplate,
+      link: linkTemplate,
+    }).link("https://example.com", "title text", "link text"),
+    `<a href="https://example.com" data-decor-attribute-href="url" data-decor-attribute-title="title" data-decor-content="content" title="title text">link text</a>`
+  );
+});
+
+Deno.test("`templateRenderer.link` omits title when it's not provided", () => {
+  const document = new DOMParser().parseFromString(
+    `<a href data-decor-attribute-href="url" data-decor-attribute-title="title" data-decor-content="content">
+example
+</a>`,
+    "text/html"
+  )!;
+  const linkTemplate = document.body.children[0];
+
+  assertEquals(
+    templateRenderer({
+      ...testTemplate,
+      link: linkTemplate,
+    }).link("https://example.com", null, "link text"),
+    `<a href="https://example.com" data-decor-attribute-href="url" data-decor-attribute-title="title" data-decor-content="content">link text</a>`
+  );
+});

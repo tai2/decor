@@ -1,5 +1,5 @@
 import { Element } from "https://deno.land/x/deno_dom/deno-dom-wasm.ts";
-import { escape } from "./marked.ts";
+import { escape, cleanUrl } from "./marked.ts";
 import { Renderer } from "./renderer.ts";
 
 export type Template = {
@@ -127,7 +127,8 @@ function applyParameters(
 
     const parameter = parameters[parameterKey];
     if (!parameter) {
-      throw `Expected parameter is not provided. key=${parameterKey}`;
+      // Optinal parameters like `title` can be undefined. Let's skip it.
+      continue;
     }
 
     switch (expectedParameter.destination.type) {
@@ -173,8 +174,8 @@ export function templateRenderer(template: Template): Renderer {
       code = code.replace(/\n$/, "") + "\n";
 
       const parameters = {
-        infoString: infoStringTrimmed,
         content: escaped ? code : escape(code, true),
+        infoString: infoStringTrimmed,
       };
 
       // Extract attribute keys
@@ -254,7 +255,56 @@ export function templateRenderer(template: Template): Renderer {
     codespan: () => "",
     br: () => "",
     del: () => "",
-    link: () => "",
+    link: (href: string, title: string | null | undefined, text: string) => {
+      // Clone the template element
+      const linkTemplate = template.link.cloneNode(true) as Element;
+
+      // Prepare parameters
+      const cleanHref = cleanUrl(href);
+
+      const parameters = {
+        content: text,
+        title: title === null ? undefined : title,
+        url: cleanHref ?? undefined,
+      };
+
+      // Extract attribute keys
+      const attributeKeys = getAttributeKeysFromCache("link");
+
+      // Prepare expected parameters
+      const expectedParameters = {
+        content: {
+          destination: {
+            type: "content",
+          },
+          isReferenced: false,
+        },
+        title: {
+          destination: {
+            type: "attribute",
+            default: "title",
+          },
+          isReferenced: false,
+        },
+        url: {
+          destination: {
+            type: "attribute",
+            default: "href",
+          },
+          isReferenced: false,
+        },
+      } as const;
+
+      // Finalize the HTML fragment by applying parameters
+      applyParameters(
+        linkTemplate,
+        parameters,
+        attributeKeys,
+        expectedParameters
+      );
+
+      return linkTemplate.outerHTML;
+    },
     image: () => "",
     text: (text) => text,
   };

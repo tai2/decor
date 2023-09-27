@@ -2,6 +2,7 @@ export { marked } from "https://raw.githubusercontent.com/markedjs/marked/v9.0.0
 export {
   escape,
   unescape,
+  cleanUrl,
 } from "https://raw.githubusercontent.com/markedjs/marked/v9.0.0/src/helpers.ts";
 export type {
   Token,
