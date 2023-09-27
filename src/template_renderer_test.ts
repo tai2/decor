@@ -117,7 +117,7 @@ console.log("Hello, World!");
 Deno.test("`templateRenderer.blockquote` renders received parameters", () => {
   const document = new DOMParser().parseFromString(
     `<blockquote data-decor-content="content">
-The quick brown fox jumps over the lazy dog
+The quick brown fox jumps over the lazy dog.
 </blockquote>`,
     "text/html"
   )!;
@@ -131,3 +131,26 @@ The quick brown fox jumps over the lazy dog
     `<blockquote data-decor-content="content">Sphinx of black quartz, judge my vow.</blockquote>`
   );
 });
+
+Deno.test(
+  "`templateRenderer.blockquote` can render content parameter to an attribute",
+  () => {
+    const document = new DOMParser().parseFromString(
+      `<blockquote data-decor-attribute-title="content">
+The quick brown fox jumps over the lazy dog.
+</blockquote>`,
+      "text/html"
+    )!;
+    const blockQuoteTemplate = document.body.children[0];
+
+    assertEquals(
+      templateRenderer({
+        ...testTemplate,
+        blockQuote: blockQuoteTemplate,
+      }).blockquote("Sphinx of black quartz, judge my vow."),
+      `<blockquote data-decor-attribute-title="content" title="Sphinx of black quartz, judge my vow.">
+The quick brown fox jumps over the lazy dog.
+</blockquote>`
+    );
+  }
+);

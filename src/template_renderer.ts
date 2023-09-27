@@ -53,6 +53,94 @@ export function getAttributeKeys(template: Element): string[] {
   );
 }
 
+type ExpectedParameters = Record<
+  string,
+  {
+    destination:
+      | {
+          type: "content";
+        }
+      | {
+          type: "attribute";
+          default: string;
+        };
+    isReferenced: boolean;
+  }
+>;
+
+function applyParameters(
+  template: Element,
+  parameters: Record<string, string | undefined>,
+  attributeKeys: string[],
+  expectedParameters: ExpectedParameters
+) {
+  const contentContainers = Array.from(
+    template.querySelectorAll("[data-decor-content]")
+  );
+  if (template.hasAttribute("data-decor-content")) {
+    contentContainers.push(template);
+  }
+  for (const contentContainer of contentContainers) {
+    const container = contentContainer as Element;
+    const parameterKey = container.getAttribute("data-decor-content");
+    if (parameterKey && parameters[parameterKey]) {
+      if (expectedParameters[parameterKey]) {
+        expectedParameters[parameterKey].isReferenced = true;
+      }
+      container.textContent = parameters[parameterKey]!;
+    }
+  }
+
+  for (const attributeKey of attributeKeys) {
+    const destinaionAttribute = attributeKey.substring(
+      "data-decor-attribute-".length
+    );
+
+    const attributeContainers = Array.from(
+      template.querySelectorAll(`[${attributeKey}]`)
+    );
+    if (template.hasAttribute(attributeKey)) {
+      attributeContainers.push(template);
+    }
+    for (const attributeContainer of attributeContainers) {
+      const container = attributeContainer as Element;
+      const parameterKey = container.getAttribute(attributeKey);
+      if (parameterKey) {
+        if (expectedParameters[parameterKey]) {
+          expectedParameters[parameterKey].isReferenced = true;
+        }
+        if (parameters[parameterKey]) {
+          container.setAttribute(destinaionAttribute, parameters[parameterKey]);
+        }
+      }
+    }
+  }
+
+  // When expected parameter is not consumed by any content or attribute, decor apply it to the
+  // root element.
+  for (const [parameterKey, expectedParameter] of Object.entries(
+    expectedParameters
+  )) {
+    if (expectedParameter.isReferenced) {
+      continue;
+    }
+
+    const parameter = parameters[parameterKey];
+    if (!parameter) {
+      throw `Expected parameter is not provided. key=${parameterKey}`;
+    }
+
+    switch (expectedParameter.destination.type) {
+      case "content":
+        template.textContent = parameter;
+        break;
+      case "attribute":
+        template.setAttribute(expectedParameter.destination.default, parameter);
+        break;
+    }
+  }
+}
+
 export function templateRenderer(template: Template): Renderer {
   // CSS Selectors doesn't support wildcard attribute names and deno-dom doesn't support
   // XPath query so we need to traverse the DOM tree to collect all attribute keys.
@@ -71,71 +159,16 @@ export function templateRenderer(template: Template): Renderer {
     return attributeKeys;
   }
 
-  function replaceContents(
-    template: Element,
-    parameters: Record<string, string | undefined>
-  ) {
-    const contentContainers = template.querySelectorAll("[data-decor-content]");
-    for (const contentContainer of contentContainers) {
-      const container = contentContainer as Element;
-      const parameterName = container.getAttribute("data-decor-content");
-      if (parameterName && parameters[parameterName]) {
-        container.textContent = parameters[parameterName]!;
-      }
-    }
-    // When there is no content specifier, decor apply it to the root element.
-    if (contentContainers.length === 0) {
-      template.textContent = parameters["content"]!;
-    }
-  }
-
-  function addAttributes(
-    template: Element,
-    parameters: Record<string, string | undefined>,
-    expectedParameters: Record<
-      string,
-      { defaultAttribute: string; isReferenced: boolean }
-    >
-  ) {
-    const attributeKeys = getAttributeKeysFromCache("codeBlock");
-    for (const attributeKey of attributeKeys) {
-      const destinaionAttribute = attributeKey.substring(
-        "data-decor-attribute-".length
-      );
-      const attributeContainers = template.querySelectorAll(
-        `[${attributeKey}]`
-      );
-      for (const attributeContainer of attributeContainers) {
-        const container = attributeContainer as Element;
-        const parameterKey = container.getAttribute(attributeKey);
-        if (parameterKey && expectedParameters[parameterKey]) {
-          expectedParameters[parameterKey].isReferenced = true;
-          if (parameters[parameterKey]) {
-            container.setAttribute(
-              destinaionAttribute,
-              parameters[parameterKey]
-            );
-          }
-        }
-      }
-    }
-    // When expected parameter is not consumed by any attribute, decor apply it to the root element.
-    for (const [
-      parameterKey,
-      { defaultAttribute, isReferenced },
-    ] of Object.entries(expectedParameters)) {
-      if (!isReferenced) {
-        template.setAttribute(defaultAttribute, parameters[parameterKey]);
-      }
-    }
-  }
-
   return {
     code: (
       code: string,
       infostring: string | undefined,
       escaped: boolean
     ): string => {
+      // Clone the template element
+      const codeBlockTemplate = template.codeBlock.cloneNode(true) as Element;
+
+      // Prepare parameters
       const infoStringTrimmed = (infostring || "").match(/^\S*/)?.[0];
       code = code.replace(/\n$/, "") + "\n";
 
@@ -144,33 +177,65 @@ export function templateRenderer(template: Template): Renderer {
         content: escaped ? code : escape(code, true),
       };
 
-      const codeBlockTemplate = template.codeBlock.cloneNode(true) as Element;
+      // Extract attribute keys
+      const attributeKeys = getAttributeKeysFromCache("codeBlock");
 
-      replaceContents(codeBlockTemplate, parameters);
-
-      const expectedParameters: Record<
-        string,
-        { defaultAttribute: string; isReferenced: boolean }
-      > = {
+      // Prepare expected parameters
+      const expectedParameters: ExpectedParameters = {
+        content: {
+          destination: {
+            type: "content",
+          },
+          isReferenced: false,
+        },
         infoString: {
-          defaultAttribute: "data-language",
+          destination: {
+            type: "attribute",
+            default: "data-language",
+          },
           isReferenced: false,
         },
       };
-      addAttributes(codeBlockTemplate, parameters, expectedParameters);
+
+      // Finalize the HTML fragment by applying parameters
+      applyParameters(
+        codeBlockTemplate,
+        parameters,
+        attributeKeys,
+        expectedParameters
+      );
 
       return codeBlockTemplate.outerHTML;
     },
     blockquote: (quote: string) => {
+      // Clone the template element
+      const blockQuoteTemplate = template.blockQuote.cloneNode(true) as Element;
+
+      // Prepare parameters
       const parameters: Record<string, string | undefined> = {
         content: quote,
       };
 
-      const blockQuoteTemplate = template.blockQuote.cloneNode(true) as Element;
+      // Extract attribute keys
+      const attributeKeys = getAttributeKeysFromCache("blockQuote");
 
-      replaceContents(blockQuoteTemplate, parameters);
+      // Prepare expected parameters
+      const expectedParameters: ExpectedParameters = {
+        content: {
+          destination: {
+            type: "content",
+          },
+          isReferenced: false,
+        },
+      };
 
-      addAttributes(blockQuoteTemplate, parameters, {});
+      // Finalize the HTML fragment by applying parameters
+      applyParameters(
+        blockQuoteTemplate,
+        parameters,
+        attributeKeys,
+        expectedParameters
+      );
 
       return blockQuoteTemplate.outerHTML;
     },
