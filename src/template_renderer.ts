@@ -157,19 +157,22 @@ export function templateRenderer(template: Template): Renderer {
     return attributeKeys;
   }
 
+  function cloneTemplateThenApplyParameters(
+    templateType: keyof Template,
+    parameters: Parameters
+  ) {
+    const templateElement = template[templateType].cloneNode(true) as Element;
+    const attributeKeys = getAttributeKeysFromCache(templateType);
+    applyParameters(templateElement, attributeKeys, parameters);
+    return templateElement;
+  }
+
   return {
     code: (
       code: string,
       infostring: string | undefined,
       escaped: boolean
     ): string => {
-      // Clone the template element
-      const codeBlockTemplate = template.codeBlock.cloneNode(true) as Element;
-
-      // Extract attribute keys
-      const attributeKeys = getAttributeKeysFromCache("codeBlock");
-
-      // Prepare parameters
       const infoStringTrimmed = (infostring || "").match(/^\S*/)?.[0];
       code = code.replace(/\n$/, "") + "\n";
 
@@ -191,19 +194,10 @@ export function templateRenderer(template: Template): Renderer {
         },
       } as const;
 
-      // Finalize the HTML fragment by applying parameters
-      applyParameters(codeBlockTemplate, attributeKeys, parameters);
-
-      return codeBlockTemplate.outerHTML;
+      return cloneTemplateThenApplyParameters("codeBlock", parameters)
+        .outerHTML;
     },
     blockquote: (quote: string) => {
-      // Clone the template element
-      const blockQuoteTemplate = template.blockQuote.cloneNode(true) as Element;
-
-      // Extract attribute keys
-      const attributeKeys = getAttributeKeysFromCache("blockQuote");
-
-      // Prepare parameters
       const parameters = {
         content: {
           value: quote,
@@ -214,10 +208,8 @@ export function templateRenderer(template: Template): Renderer {
         },
       } as const;
 
-      // Finalize the HTML fragment by applying parameters
-      applyParameters(blockQuoteTemplate, attributeKeys, parameters);
-
-      return blockQuoteTemplate.outerHTML;
+      return cloneTemplateThenApplyParameters("blockQuote", parameters)
+        .outerHTML;
     },
     html: () => "",
     heading: () => "",
@@ -235,13 +227,6 @@ export function templateRenderer(template: Template): Renderer {
     br: () => "",
     del: () => "",
     link: (href: string, title: string | null | undefined, text: string) => {
-      // Clone the template element
-      const linkTemplate = template.link.cloneNode(true) as Element;
-
-      // Extract attribute keys
-      const attributeKeys = getAttributeKeysFromCache("link");
-
-      // Prepare parameters
       const cleanHref = cleanUrl(href);
 
       const parameters = {
@@ -270,10 +255,7 @@ export function templateRenderer(template: Template): Renderer {
         },
       } as const;
 
-      // Finalize the HTML fragment by applying parameters
-      applyParameters(linkTemplate, attributeKeys, parameters);
-
-      return linkTemplate.outerHTML;
+      return cloneTemplateThenApplyParameters("link", parameters).outerHTML;
     },
     image: () => "",
     text: (text) => text,
