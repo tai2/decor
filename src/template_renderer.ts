@@ -172,7 +172,7 @@ export function templateRenderer(template: Template): Renderer {
       const infoStringTrimmed = (infostring || "").match(/^\S*/)?.[0];
       code = code.replace(/\n$/, "") + "\n";
 
-      const parameters: Record<string, string | undefined> = {
+      const parameters = {
         infoString: infoStringTrimmed,
         content: escaped ? code : escape(code, true),
       };
@@ -181,7 +181,7 @@ export function templateRenderer(template: Template): Renderer {
       const attributeKeys = getAttributeKeysFromCache("codeBlock");
 
       // Prepare expected parameters
-      const expectedParameters: ExpectedParameters = {
+      const expectedParameters = {
         content: {
           destination: {
             type: "content",
@@ -195,7 +195,7 @@ export function templateRenderer(template: Template): Renderer {
           },
           isReferenced: false,
         },
-      };
+      } as const;
 
       // Finalize the HTML fragment by applying parameters
       applyParameters(
@@ -212,7 +212,7 @@ export function templateRenderer(template: Template): Renderer {
       const blockQuoteTemplate = template.blockQuote.cloneNode(true) as Element;
 
       // Prepare parameters
-      const parameters: Record<string, string | undefined> = {
+      const parameters = {
         content: quote,
       };
 
@@ -220,14 +220,14 @@ export function templateRenderer(template: Template): Renderer {
       const attributeKeys = getAttributeKeysFromCache("blockQuote");
 
       // Prepare expected parameters
-      const expectedParameters: ExpectedParameters = {
+      const expectedParameters = {
         content: {
           destination: {
             type: "content",
           },
           isReferenced: false,
         },
-      };
+      } as const;
 
       // Finalize the HTML fragment by applying parameters
       applyParameters(
