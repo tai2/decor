@@ -53,9 +53,10 @@ export function getAttributeKeys(template: Element): string[] {
   );
 }
 
-type ExpectedParameters = Record<
+type Parameters = Record<
   string,
   {
+    value: string | undefined;
     destination:
       | {
           type: "content";
@@ -70,9 +71,8 @@ type ExpectedParameters = Record<
 
 function applyParameters(
   template: Element,
-  parameters: Record<string, string | undefined>,
   attributeKeys: string[],
-  expectedParameters: ExpectedParameters
+  parameters: Parameters
 ) {
   const contentContainers = Array.from(
     template.querySelectorAll("[data-decor-content]")
@@ -83,11 +83,12 @@ function applyParameters(
   for (const contentContainer of contentContainers) {
     const container = contentContainer as Element;
     const parameterKey = container.getAttribute("data-decor-content");
-    if (parameterKey && parameters[parameterKey]) {
-      if (expectedParameters[parameterKey]) {
-        expectedParameters[parameterKey].isReferenced = true;
+    const parameter = parameterKey && parameters[parameterKey];
+    if (parameter) {
+      parameter.isReferenced = true;
+      if (parameter.value) {
+        container.textContent = parameter.value;
       }
-      container.textContent = parameters[parameterKey]!;
     }
   }
 
@@ -105,38 +106,34 @@ function applyParameters(
     for (const attributeContainer of attributeContainers) {
       const container = attributeContainer as Element;
       const parameterKey = container.getAttribute(attributeKey);
-      if (parameterKey) {
-        if (expectedParameters[parameterKey]) {
-          expectedParameters[parameterKey].isReferenced = true;
-        }
-        if (parameters[parameterKey]) {
-          container.setAttribute(destinaionAttribute, parameters[parameterKey]);
+      const parameter = parameterKey && parameters[parameterKey];
+      if (parameter) {
+        parameter.isReferenced = true;
+        if (parameter.value) {
+          container.setAttribute(destinaionAttribute, parameter.value);
         }
       }
     }
   }
 
-  // When expected parameter is not consumed by any content or attribute, decor apply it to the
+  // When expected parameter is not consumed by any content or attribute, decor applies it to the
   // root element.
-  for (const [parameterKey, expectedParameter] of Object.entries(
-    expectedParameters
-  )) {
-    if (expectedParameter.isReferenced) {
+  for (const parameter of Object.values(parameters)) {
+    if (parameter.isReferenced) {
       continue;
     }
 
-    const parameter = parameters[parameterKey];
-    if (!parameter) {
+    if (!parameter.value) {
       // Optinal parameters like `title` can be undefined. Let's skip it.
       continue;
     }
 
-    switch (expectedParameter.destination.type) {
+    switch (parameter.destination.type) {
       case "content":
-        template.textContent = parameter;
+        template.textContent = parameter.value;
         break;
       case "attribute":
-        template.setAttribute(expectedParameter.destination.default, parameter);
+        template.setAttribute(parameter.destination.default, parameter.value);
         break;
     }
   }
@@ -169,27 +166,23 @@ export function templateRenderer(template: Template): Renderer {
       // Clone the template element
       const codeBlockTemplate = template.codeBlock.cloneNode(true) as Element;
 
+      // Extract attribute keys
+      const attributeKeys = getAttributeKeysFromCache("codeBlock");
+
       // Prepare parameters
       const infoStringTrimmed = (infostring || "").match(/^\S*/)?.[0];
       code = code.replace(/\n$/, "") + "\n";
 
       const parameters = {
-        content: escaped ? code : escape(code, true),
-        infoString: infoStringTrimmed,
-      };
-
-      // Extract attribute keys
-      const attributeKeys = getAttributeKeysFromCache("codeBlock");
-
-      // Prepare expected parameters
-      const expectedParameters = {
         content: {
+          value: escaped ? code : escape(code, true),
           destination: {
             type: "content",
           },
           isReferenced: false,
         },
         infoString: {
+          value: infoStringTrimmed,
           destination: {
             type: "attribute",
             default: "data-language",
@@ -199,12 +192,7 @@ export function templateRenderer(template: Template): Renderer {
       } as const;
 
       // Finalize the HTML fragment by applying parameters
-      applyParameters(
-        codeBlockTemplate,
-        parameters,
-        attributeKeys,
-        expectedParameters
-      );
+      applyParameters(codeBlockTemplate, attributeKeys, parameters);
 
       return codeBlockTemplate.outerHTML;
     },
@@ -212,17 +200,13 @@ export function templateRenderer(template: Template): Renderer {
       // Clone the template element
       const blockQuoteTemplate = template.blockQuote.cloneNode(true) as Element;
 
-      // Prepare parameters
-      const parameters = {
-        content: quote,
-      };
-
       // Extract attribute keys
       const attributeKeys = getAttributeKeysFromCache("blockQuote");
 
-      // Prepare expected parameters
-      const expectedParameters = {
+      // Prepare parameters
+      const parameters = {
         content: {
+          value: quote,
           destination: {
             type: "content",
           },
@@ -231,12 +215,7 @@ export function templateRenderer(template: Template): Renderer {
       } as const;
 
       // Finalize the HTML fragment by applying parameters
-      applyParameters(
-        blockQuoteTemplate,
-        parameters,
-        attributeKeys,
-        expectedParameters
-      );
+      applyParameters(blockQuoteTemplate, attributeKeys, parameters);
 
       return blockQuoteTemplate.outerHTML;
     },
@@ -259,27 +238,22 @@ export function templateRenderer(template: Template): Renderer {
       // Clone the template element
       const linkTemplate = template.link.cloneNode(true) as Element;
 
+      // Extract attribute keys
+      const attributeKeys = getAttributeKeysFromCache("link");
+
       // Prepare parameters
       const cleanHref = cleanUrl(href);
 
       const parameters = {
-        content: text,
-        title: title === null ? undefined : title,
-        url: cleanHref ?? undefined,
-      };
-
-      // Extract attribute keys
-      const attributeKeys = getAttributeKeysFromCache("link");
-
-      // Prepare expected parameters
-      const expectedParameters = {
         content: {
+          value: text,
           destination: {
             type: "content",
           },
           isReferenced: false,
         },
         title: {
+          value: title ?? undefined,
           destination: {
             type: "attribute",
             default: "title",
@@ -287,6 +261,7 @@ export function templateRenderer(template: Template): Renderer {
           isReferenced: false,
         },
         url: {
+          value: cleanHref ?? undefined,
           destination: {
             type: "attribute",
             default: "href",
@@ -296,12 +271,7 @@ export function templateRenderer(template: Template): Renderer {
       } as const;
 
       // Finalize the HTML fragment by applying parameters
-      applyParameters(
-        linkTemplate,
-        parameters,
-        attributeKeys,
-        expectedParameters
-      );
+      applyParameters(linkTemplate, attributeKeys, parameters);
 
       return linkTemplate.outerHTML;
     },
