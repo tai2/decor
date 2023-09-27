@@ -190,3 +190,5 @@ example
     `<a href="https://example.com" data-decor-attribute-href="url" data-decor-attribute-title="title" data-decor-content="content">link text</a>`
   );
 });
+
+// TODO: test successive calls of two different render methods works correctly (meant fo attribute key cache)
