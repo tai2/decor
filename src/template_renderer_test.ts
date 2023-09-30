@@ -191,4 +191,38 @@ example
   );
 });
 
-// TODO: test successive calls of two different render methods works correctly (meant fo attribute key cache)
+Deno.test(
+  "successive calls of two different render methods works correctly (meant fo attribute key cache)",
+  () => {
+    const document = new DOMParser().parseFromString(
+      `<pre>
+<code>
+console.log("Hello, World!");
+</code>
+</pre>
+<a href data-decor-attribute-href="url" data-decor-attribute-title="title" data-decor-content="content">
+example
+</a>
+`,
+      "text/html"
+    )!;
+
+    const codeBlockTemplate = document.body.children[0];
+    const linkTemplate = document.body.children[1];
+
+    const renderer = templateRenderer({
+      ...testTemplate,
+      codeBlock: codeBlockTemplate,
+      link: linkTemplate,
+    });
+
+    // This call caches its attribute keys with the key `codeBlock` and should not affect the
+    // result of the next call.
+    renderer.code('alert("Hello, World!");', "javascript", false);
+
+    assertEquals(
+      renderer.link("https://example.com", null, "link text"),
+      `<a href="https://example.com" data-decor-attribute-href="url" data-decor-attribute-title="title" data-decor-content="content">link text</a>`
+    );
+  }
+);
