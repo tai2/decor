@@ -1,4 +1,4 @@
-import { Element } from "https://deno.land/x/deno_dom/deno-dom-wasm.ts";
+import { Element } from "https://deno.land/x/deno_dom@v0.1.38/deno-dom-wasm.ts";
 import { escape, cleanUrl } from "./marked.ts";
 import { Renderer } from "./renderer.ts";
 
