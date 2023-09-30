@@ -214,7 +214,40 @@ export function templateRenderer(template: Template): Renderer {
     html: (html: string, _block?: boolean) => {
       return html;
     },
-    heading: () => "",
+    heading: (text: string, level: number, _raw: string) => {
+      const parameters = {
+        content: {
+          value: text,
+          destination: {
+            type: "content",
+          },
+          isReferenced: false,
+        },
+      } as const;
+
+      switch (level) {
+        case 1:
+          return cloneTemplateThenApplyParameters("heading1", parameters)
+            .outerHTML;
+        case 2:
+          return cloneTemplateThenApplyParameters("heading2", parameters)
+            .outerHTML;
+        case 3:
+          return cloneTemplateThenApplyParameters("heading3", parameters)
+            .outerHTML;
+        case 4:
+          return cloneTemplateThenApplyParameters("heading4", parameters)
+            .outerHTML;
+        case 5:
+          return cloneTemplateThenApplyParameters("heading5", parameters)
+            .outerHTML;
+        case 6:
+          return cloneTemplateThenApplyParameters("heading6", parameters)
+            .outerHTML;
+        default:
+          throw new Error(`Unknown heading level: ${level}`);
+      }
+    },
     hr: () => "",
     list: () => "",
     listitem: (text) => text,

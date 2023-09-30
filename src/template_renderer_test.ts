@@ -164,6 +164,39 @@ Deno.test("`templateRenderer.html` renders HTML as it is", () => {
   );
 });
 
+Deno.test("`templateRenderer.heading` renders received parameters", () => {
+  const document = new DOMParser().parseFromString(
+    `<h1 data-decor-content="content">Headding 1</h1>
+    <h2 data-decor-content="content">Headding 2</h2>
+    <h3 data-decor-content="content">Headding 3</h3>
+    <h4 data-decor-content="content">Headding 4</h4>
+    <h5 data-decor-content="content">Headding 5</h5>
+    <h6 data-decor-content="content">Headding 6</h6>`,
+    "text/html"
+  )!;
+
+  const renderer = templateRenderer({
+    ...testTemplate,
+    heading1: document.body.children[0],
+    heading2: document.body.children[1],
+    heading3: document.body.children[2],
+    heading4: document.body.children[3],
+    heading5: document.body.children[4],
+    heading6: document.body.children[5],
+  });
+
+  for (let i = 1; i <= 6; i++) {
+    assertEquals(
+      renderer.heading(
+        "Sphinx of black quartz, judge my vow.",
+        i,
+        "Sphinx of black quartz, judge my vow."
+      ),
+      `<h${i} data-decor-content="content">Sphinx of black quartz, judge my vow.</h${i}>`
+    );
+  }
+});
+
 Deno.test("`templateRenderer.link` renders received parameters", () => {
   const document = new DOMParser().parseFromString(
     `<a href data-decor-attribute-href="url" data-decor-attribute-title="title" data-decor-content="content">
