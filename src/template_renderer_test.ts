@@ -155,6 +155,15 @@ The quick brown fox jumps over the lazy dog.
   }
 );
 
+Deno.test("`templateRenderer.html` renders HTML as it is", () => {
+  assertEquals(
+    templateRenderer(testTemplate).html(
+      '<address><a href="tel:+13115552368">(311) 555-2368</a></address>'
+    ),
+    '<address><a href="tel:+13115552368">(311) 555-2368</a></address>'
+  );
+});
+
 Deno.test("`templateRenderer.link` renders received parameters", () => {
   const document = new DOMParser().parseFromString(
     `<a href data-decor-attribute-href="url" data-decor-attribute-title="title" data-decor-content="content">

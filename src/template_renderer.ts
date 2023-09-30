@@ -211,7 +211,9 @@ export function templateRenderer(template: Template): Renderer {
       return cloneTemplateThenApplyParameters("blockQuote", parameters)
         .outerHTML;
     },
-    html: () => "",
+    html: (html: string, _block?: boolean) => {
+      return html;
+    },
     heading: () => "",
     hr: () => "",
     list: () => "",
