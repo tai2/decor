@@ -248,7 +248,9 @@ export function templateRenderer(template: Template): Renderer {
           throw new Error(`Unknown heading level: ${level}`);
       }
     },
-    hr: () => "",
+    hr: () => {
+      return cloneTemplateThenApplyParameters("thematicBreak", {}).outerHTML;
+    },
     list: () => "",
     listitem: (text) => text,
     checkbox: () => "",

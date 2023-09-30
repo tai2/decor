@@ -197,6 +197,19 @@ Deno.test("`templateRenderer.heading` renders received parameters", () => {
   }
 });
 
+Deno.test("`templateRenderer.hr` renders the given template", () => {
+  const document = new DOMParser().parseFromString(`<hr>`, "text/html")!;
+  const thematicBreakTemplate = document.body.children[0];
+
+  assertEquals(
+    templateRenderer({
+      ...testTemplate,
+      thematicBreak: thematicBreakTemplate,
+    }).hr(),
+    `<hr>`
+  );
+});
+
 Deno.test("`templateRenderer.link` renders received parameters", () => {
   const document = new DOMParser().parseFromString(
     `<a href data-decor-attribute-href="url" data-decor-attribute-title="title" data-decor-content="content">
