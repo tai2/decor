@@ -281,3 +281,47 @@ example
     );
   }
 );
+
+Deno.test(
+  "`templateRenderer.image` renders received parameters with image template when the file extention is a image one",
+  () => {
+    const document = new DOMParser().parseFromString(
+      `<img data-decor-attribute-src="url" data-decor-attribute-title="title" data-decor-attribute-alt="description">`,
+      "text/html"
+    )!;
+    const imageTemplate = document.body.children[0];
+
+    assertEquals(
+      templateRenderer({
+        ...testTemplate,
+        image: imageTemplate,
+      }).image("https://example.com/a.jpeg", "title text", "description text"),
+      `<img data-decor-attribute-src="url" data-decor-attribute-title="title" data-decor-attribute-alt="description" src="https://example.com/a.jpeg" title="title text" alt="description text">`
+    );
+  }
+);
+
+Deno.test(
+  "`templateRenderer.image` renders received parameters with video template when the file extention is a video one",
+  () => {
+    const document = new DOMParser().parseFromString(
+      `<video data-decor-attribute-title="title">
+<source data-decor-attribute-src="url">
+<a data-decor-attribute-href="url" data-decor-content="description">link text</a>
+</video>`,
+      "text/html"
+    )!;
+    const videoTemplate = document.body.children[0];
+
+    assertEquals(
+      templateRenderer({
+        ...testTemplate,
+        video: videoTemplate,
+      }).image("https://example.com/a.mp4", "title text", "description text"),
+      `<video data-decor-attribute-title="title" title="title text">
+<source data-decor-attribute-src="url" src="https://example.com/a.mp4">
+<a data-decor-attribute-href="url" data-decor-content="description" href="https://example.com/a.mp4">description text</a>
+</video>`
+    );
+  }
+);

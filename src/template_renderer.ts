@@ -1,4 +1,6 @@
 import { Element } from "https://deno.land/x/deno_dom@v0.1.38/deno-dom-wasm.ts";
+import { extname } from "https://deno.land/std@0.202.0/url/mod.ts";
+import { contentType } from "https://deno.land/std@0.203.0/media_types/mod.ts";
 import { escape, cleanUrl } from "./marked.ts";
 import { Renderer } from "./renderer.ts";
 
@@ -294,7 +296,41 @@ export function templateRenderer(template: Template): Renderer {
 
       return cloneTemplateThenApplyParameters("link", parameters).outerHTML;
     },
-    image: () => "",
+    image: (href: string, title: string | null, text: string) => {
+      const cleanHref = cleanUrl(href);
+
+      const parameters = {
+        description: {
+          value: text,
+          destination: {
+            type: "attribute",
+            default: "alt",
+          },
+          isReferenced: false,
+        },
+        title: {
+          value: title ?? undefined,
+          destination: {
+            type: "attribute",
+            default: "title",
+          },
+          isReferenced: false,
+        },
+        url: {
+          value: cleanHref ?? undefined,
+          destination: {
+            type: "attribute",
+            default: "src",
+          },
+          isReferenced: false,
+        },
+      } as const;
+
+      return cleanHref !== null &&
+        contentType(extname(cleanHref))?.startsWith("video")
+        ? cloneTemplateThenApplyParameters("video", parameters).outerHTML
+        : cloneTemplateThenApplyParameters("image", parameters).outerHTML;
+    },
     text: (text) => text,
   };
 }
