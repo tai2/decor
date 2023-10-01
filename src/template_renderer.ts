@@ -264,7 +264,20 @@ export function templateRenderer(template: Template): Renderer {
     em: () => "",
     codespan: () => "",
     br: () => "",
-    del: () => "",
+    del: (text: string) => {
+      const parameters = {
+        content: {
+          value: text,
+          destination: {
+            type: "content",
+          },
+          isReferenced: false,
+        },
+      } as const;
+
+      return cloneTemplateThenApplyParameters("strikeThrough", parameters)
+        .outerHTML;
+    },
     link: (href: string, title: string | null | undefined, text: string) => {
       const cleanHref = cleanUrl(href);
 

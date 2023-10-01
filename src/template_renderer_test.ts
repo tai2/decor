@@ -210,6 +210,22 @@ Deno.test("`templateRenderer.hr` renders the given template", () => {
   );
 });
 
+Deno.test("`templateRenderer.del` renders received parameters", () => {
+  const document = new DOMParser().parseFromString(
+    `<del data-decor-content="content">The quick brown fox jumps over the lazy dog.</del>`,
+    "text/html"
+  )!;
+  const strikeThroughTemplate = document.body.children[0];
+
+  assertEquals(
+    templateRenderer({
+      ...testTemplate,
+      strikeThrough: strikeThroughTemplate,
+    }).del("Sphinx of black quartz, judge my vow."),
+    `<del data-decor-content="content">Sphinx of black quartz, judge my vow.</del>`
+  );
+});
+
 Deno.test("`templateRenderer.link` renders received parameters", () => {
   const document = new DOMParser().parseFromString(
     `<a data-decor-attribute-href="url" data-decor-attribute-title="title" data-decor-content="content">
