@@ -67,6 +67,7 @@ its type. `decor` follows the definitions in
 | `emphasis`                                                  | `content`                     |
 | `strong_emphasis`                                           | `content`                     |
 | `strike_through`                                            | `content`                     |
+| `hard_line_break`                                           | None                          |
 
 These keywards are also used as specifiers for corresponding template elements
 in template files.

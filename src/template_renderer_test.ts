@@ -37,6 +37,7 @@ const testTemplate: Template = {
   emphasis: divElement,
   strongEmphasis: divElement,
   strikeThrough: divElement,
+  hardLineBreak: divElement,
 };
 
 Deno.test(
@@ -207,6 +208,19 @@ Deno.test("`templateRenderer.hr` renders the given template", () => {
       thematicBreak: thematicBreakTemplate,
     }).hr(),
     `<hr>`
+  );
+});
+
+Deno.test("`templateRenderer.br` renders the given template", () => {
+  const document = new DOMParser().parseFromString(`<br>`, "text/html")!;
+  const hardLineBreakTemplate = document.body.children[0];
+
+  assertEquals(
+    templateRenderer({
+      ...testTemplate,
+      hardLineBreak: hardLineBreakTemplate,
+    }).br(),
+    `<br>`
   );
 });
 

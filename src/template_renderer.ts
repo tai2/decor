@@ -31,6 +31,7 @@ export type Template = {
   emphasis: Element;
   strongEmphasis: Element;
   strikeThrough: Element;
+  hardLineBreak: Element;
 };
 
 // Traverse the template and collect all attribute keys start with "data-decor-attribute-" and
@@ -263,7 +264,9 @@ export function templateRenderer(template: Template): Renderer {
     strong: () => "",
     em: () => "",
     codespan: () => "",
-    br: () => "",
+    br: () => {
+      return cloneTemplateThenApplyParameters("hardLineBreak", {}).outerHTML;
+    },
     del: (text: string) => {
       const parameters = {
         content: {
