@@ -257,7 +257,20 @@ export function templateRenderer(template: Template): Renderer {
     list: () => "",
     listitem: (text) => text,
     checkbox: () => "",
-    paragraph: (text) => text,
+    paragraph: (text) => {
+      const parameters = {
+        content: {
+          value: text,
+          destination: {
+            type: "content",
+          },
+          isReferenced: false,
+        },
+      } as const;
+
+      return cloneTemplateThenApplyParameters("paragraph", parameters)
+        .outerHTML;
+    },
     table: () => "",
     tablerow: (content) => content,
     tablecell: (content) => content,
