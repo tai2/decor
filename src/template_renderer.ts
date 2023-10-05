@@ -90,7 +90,7 @@ function applyParameters(
     if (parameter) {
       parameter.isReferenced = true;
       if (parameter.value) {
-        container.textContent = parameter.value;
+        container.innerHTML = parameter.value;
       }
     }
   }
@@ -133,7 +133,7 @@ function applyParameters(
 
     switch (parameter.destination.type) {
       case "content":
-        template.textContent = parameter.value;
+        template.innerHTML = parameter.value;
         break;
       case "attribute":
         template.setAttribute(parameter.destination.default, parameter.value);
@@ -254,7 +254,37 @@ export function templateRenderer(template: Template): Renderer {
     hr: () => {
       return cloneTemplateThenApplyParameters("thematicBreak", {}).outerHTML;
     },
-    list: () => "",
+    list: (body: string, ordered: boolean, start: number | "") => {
+      const parameters: Parameters = {
+        content: {
+          value: body,
+          destination: {
+            type: "content",
+          },
+          isReferenced: false,
+        } as const,
+      };
+
+      if (ordered && typeof start === "number" && start !== 1) {
+        parameters.start = {
+          value: start.toString(),
+          destination: {
+            type: "attribute",
+            default: "start",
+          },
+          isReferenced: false,
+        } as const;
+      }
+
+      console.log(
+        "outerHTML",
+        cloneTemplateThenApplyParameters("orderedList", parameters).outerHTML
+      );
+      return ordered
+        ? cloneTemplateThenApplyParameters("orderedList", parameters).outerHTML
+        : cloneTemplateThenApplyParameters("unorderedList", parameters)
+            .outerHTML;
+    },
     listitem: (
       text: string,
       ordered: boolean,

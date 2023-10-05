@@ -84,7 +84,7 @@ console.log("Hello, World!");
       "javascript",
       false
     ),
-    `<pre><code data-decor-attribute-data-langauge="infoString" data-decor-content="content" data-langauge="javascript">alert(&amp;quot;Hello, World!&amp;quot;);
+    `<pre><code data-decor-attribute-data-langauge="infoString" data-decor-content="content" data-langauge="javascript">alert("Hello, World!");
 </code>
 </pre>`
   );
@@ -109,7 +109,7 @@ console.log("Hello, World!");
         "javascript",
         false
       ),
-      `<pre data-language="javascript">alert(&amp;quot;Hello, World!&amp;quot;);
+      `<pre data-language="javascript">alert("Hello, World!");
 </pre>`
     );
   }
@@ -210,6 +210,63 @@ Deno.test("`templateRenderer.hr` renders the given template", () => {
     `<hr>`
   );
 });
+
+Deno.test(
+  "`templateRenderer.list` renders received parameters as orderd list when ordered is true",
+  () => {
+    const document = new DOMParser().parseFromString(
+      `<ol data-decor-content="content" data-decor-attribute-start="start"><li>item</li></ol>`,
+      "text/html"
+    )!;
+    const orderedListTemplate = document.body.children[0];
+
+    assertEquals(
+      templateRenderer({
+        ...testTemplate,
+        orderedList: orderedListTemplate,
+      }).list("<li>number 1</li>", true, 2),
+      `<ol data-decor-content="content" data-decor-attribute-start="start" start="2"><li>number 1</li></ol>`
+    );
+  }
+);
+
+Deno.test(
+  "`templateRenderer.list` doesn't render start attribute when start is 1",
+  () => {
+    const document = new DOMParser().parseFromString(
+      `<ol data-decor-content="content" data-decor-attribute-start="start"><li>item</li></ol>`,
+      "text/html"
+    )!;
+    const orderedListTemplate = document.body.children[0];
+
+    assertEquals(
+      templateRenderer({
+        ...testTemplate,
+        orderedList: orderedListTemplate,
+      }).list("<li>number 1</li>", true, 1),
+      `<ol data-decor-content="content" data-decor-attribute-start="start"><li>number 1</li></ol>`
+    );
+  }
+);
+
+Deno.test(
+  "`templateRenderer.list` renders received parameters as unorderd list when ordered is false",
+  () => {
+    const document = new DOMParser().parseFromString(
+      `<ul data-decor-content="content"><li>item</li></ul>`,
+      "text/html"
+    )!;
+    const unorderedListTemplate = document.body.children[0];
+
+    assertEquals(
+      templateRenderer({
+        ...testTemplate,
+        unorderedList: unorderedListTemplate,
+      }).list("<li>This is a list item</li>", false, ""),
+      `<ul data-decor-content="content"><li>This is a list item</li></ul>`
+    );
+  }
+);
 
 Deno.test(
   "`templateRenderer.listitem` renders received parameters as orderd list item when ordered is true",

@@ -56,7 +56,7 @@ its type. `decor` follows the definitions in
 | `table_header_cell`                                         | `content`, `align`            |
 | `table_row`                                                 | `content`                     |
 | `table_row_cell`                                            | `content`, `align`            |
-| `ordered_list`                                              | `content`                     |
+| `ordered_list`                                              | `content`, `start`            |
 | `ordered_list_item`                                         | `content`                     |
 | `unordered_list`                                            | `content`                     |
 | `unordered_list_item`                                       | `content`                     |
