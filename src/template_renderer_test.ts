@@ -211,6 +211,44 @@ Deno.test("`templateRenderer.hr` renders the given template", () => {
   );
 });
 
+Deno.test(
+  "`templateRenderer.listitem` renders received parameters as orderd list item when ordered is true",
+  () => {
+    const document = new DOMParser().parseFromString(
+      `<li data-decor-content="content">The quick brown fox jumps over the lazy dog.</li>`,
+      "text/html"
+    )!;
+    const orderedListItemTemplate = document.body.children[0];
+
+    assertEquals(
+      templateRenderer({
+        ...testTemplate,
+        orderedListItem: orderedListItemTemplate,
+      }).listitem("Sphinx of black quartz, judge my vow.", true, false, false),
+      `<li data-decor-content="content">Sphinx of black quartz, judge my vow.</li>`
+    );
+  }
+);
+
+Deno.test(
+  "`templateRenderer.listitem` renders received parameters as unorderd list item when ordered is false",
+  () => {
+    const document = new DOMParser().parseFromString(
+      `<li data-decor-content="content">The quick brown fox jumps over the lazy dog.</li>`,
+      "text/html"
+    )!;
+    const unorderedListItemTemplate = document.body.children[0];
+
+    assertEquals(
+      templateRenderer({
+        ...testTemplate,
+        unorderedListItem: unorderedListItemTemplate,
+      }).listitem("Sphinx of black quartz, judge my vow.", false, false, false),
+      `<li data-decor-content="content">Sphinx of black quartz, judge my vow.</li>`
+    );
+  }
+);
+
 Deno.test("`templateRenderer.checkbox` makes it back to markdown", () => {
   assertEquals(
     templateRenderer({

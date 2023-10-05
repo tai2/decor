@@ -255,7 +255,28 @@ export function templateRenderer(template: Template): Renderer {
       return cloneTemplateThenApplyParameters("thematicBreak", {}).outerHTML;
     },
     list: () => "",
-    listitem: (text) => text,
+    listitem: (
+      text: string,
+      ordered: boolean,
+      _task: boolean,
+      _checked: boolean
+    ) => {
+      const parameters = {
+        content: {
+          value: text,
+          destination: {
+            type: "content",
+          },
+          isReferenced: false,
+        },
+      } as const;
+
+      return ordered
+        ? cloneTemplateThenApplyParameters("orderedListItem", parameters)
+            .outerHTML
+        : cloneTemplateThenApplyParameters("unorderedListItem", parameters)
+            .outerHTML;
+    },
     checkbox: (checked: boolean) => {
       // task list is not supported right now
       return `[${checked ? "x" : " "}]`;
