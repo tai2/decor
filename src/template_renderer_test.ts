@@ -211,6 +211,22 @@ Deno.test("`templateRenderer.hr` renders the given template", () => {
   );
 });
 
+Deno.test("`templateRenderer.em` renders received parameters", () => {
+  const document = new DOMParser().parseFromString(
+    `<em data-decor-content="content">The quick brown fox jumps over the lazy dog.</em>`,
+    "text/html"
+  )!;
+  const emphasisTemplate = document.body.children[0];
+
+  assertEquals(
+    templateRenderer({
+      ...testTemplate,
+      emphasis: emphasisTemplate,
+    }).em("Sphinx of black quartz, judge my vow."),
+    `<em data-decor-content="content">Sphinx of black quartz, judge my vow.</em>`
+  );
+});
+
 Deno.test("`templateRenderer.codespan` renders received parameters", () => {
   const document = new DOMParser().parseFromString(
     `<code data-decor-content="content">The quick brown fox jumps over the lazy dog.</code>`,
