@@ -1,7 +1,7 @@
-import { Element } from "https://deno.land/x/deno_dom@v0.1.38/deno-dom-wasm.ts";
 import { extname } from "https://deno.land/std@0.202.0/url/mod.ts";
 import { contentType } from "https://deno.land/std@0.203.0/media_types/mod.ts";
-import { escape, cleanUrl } from "./marked.ts";
+import { Element } from "./deps/deno-dom.ts";
+import { escape, cleanUrl } from "./deps/marked.ts";
 import { Renderer } from "./renderer.ts";
 
 export type Template = {

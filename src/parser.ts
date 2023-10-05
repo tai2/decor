@@ -1,6 +1,6 @@
 import { Renderer } from "./renderer.ts";
-import { _TextRenderer, unescape } from "./marked.ts";
-import type { Token, Tokens } from "./marked.ts";
+import { _TextRenderer, unescape } from "./deps/marked.ts";
+import type { Token, Tokens } from "./deps/marked.ts";
 
 /**
  * Parsing & Compiling

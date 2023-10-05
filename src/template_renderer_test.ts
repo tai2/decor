@@ -1,9 +1,6 @@
 import { assertEquals } from "https://deno.land/std@0.202.0/assert/mod.ts";
-import {
-  DOMParser,
-  Element,
-  nodesFromString,
-} from "https://deno.land/x/deno_dom@v0.1.38/deno-dom-wasm.ts";
+import { DOMParser } from "./deps/deno-dom.ts";
+
 import {
   Template,
   getAttributeKeys,
