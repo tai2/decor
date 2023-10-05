@@ -261,7 +261,20 @@ export function templateRenderer(template: Template): Renderer {
     table: () => "",
     tablerow: (content) => content,
     tablecell: (content) => content,
-    strong: () => "",
+    strong: (text: string) => {
+      const parameters = {
+        content: {
+          value: text,
+          destination: {
+            type: "content",
+          },
+          isReferenced: false,
+        },
+      } as const;
+
+      return cloneTemplateThenApplyParameters("strongEmphasis", parameters)
+        .outerHTML;
+    },
     em: (text: string) => {
       const parameters = {
         content: {
