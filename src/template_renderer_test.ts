@@ -211,6 +211,22 @@ Deno.test("`templateRenderer.hr` renders the given template", () => {
   );
 });
 
+Deno.test("`templateRenderer.checkbox` makes it back to markdown", () => {
+  assertEquals(
+    templateRenderer({
+      ...testTemplate,
+    }).checkbox(true),
+    `[x]`
+  );
+
+  assertEquals(
+    templateRenderer({
+      ...testTemplate,
+    }).checkbox(false),
+    `[ ]`
+  );
+});
+
 Deno.test("`templateRenderer.paragraph` renders received parameters", () => {
   const document = new DOMParser().parseFromString(
     `<p data-decor-content="content">The quick brown fox jumps over the lazy dog.</p>`,

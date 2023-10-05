@@ -256,7 +256,10 @@ export function templateRenderer(template: Template): Renderer {
     },
     list: () => "",
     listitem: (text) => text,
-    checkbox: () => "",
+    checkbox: (checked: boolean) => {
+      // task list is not supported right now
+      return `[${checked ? "x" : " "}]`;
+    },
     paragraph: (text) => {
       const parameters = {
         content: {
