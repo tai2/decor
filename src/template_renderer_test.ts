@@ -211,6 +211,22 @@ Deno.test("`templateRenderer.hr` renders the given template", () => {
   );
 });
 
+Deno.test("`templateRenderer.codespan` renders received parameters", () => {
+  const document = new DOMParser().parseFromString(
+    `<code data-decor-content="content">The quick brown fox jumps over the lazy dog.</code>`,
+    "text/html"
+  )!;
+  const codeSpanTemplate = document.body.children[0];
+
+  assertEquals(
+    templateRenderer({
+      ...testTemplate,
+      codeSpan: codeSpanTemplate,
+    }).codespan("Sphinx of black quartz, judge my vow."),
+    `<code data-decor-content="content">Sphinx of black quartz, judge my vow.</code>`
+  );
+});
+
 Deno.test("`templateRenderer.br` renders the given template", () => {
   const document = new DOMParser().parseFromString(`<br>`, "text/html")!;
   const hardLineBreakTemplate = document.body.children[0];

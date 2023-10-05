@@ -263,7 +263,19 @@ export function templateRenderer(template: Template): Renderer {
     tablecell: (content) => content,
     strong: () => "",
     em: () => "",
-    codespan: () => "",
+    codespan: (text: string) => {
+      const parameters = {
+        content: {
+          value: text,
+          destination: {
+            type: "content",
+          },
+          isReferenced: false,
+        },
+      } as const;
+
+      return cloneTemplateThenApplyParameters("codeSpan", parameters).outerHTML;
+    },
     br: () => {
       return cloneTemplateThenApplyParameters("hardLineBreak", {}).outerHTML;
     },
