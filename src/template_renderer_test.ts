@@ -1,5 +1,9 @@
 import { assertEquals } from "https://deno.land/std@0.202.0/assert/mod.ts";
-import { DOMParser } from "https://deno.land/x/deno_dom/deno-dom-wasm.ts";
+import {
+  DOMParser,
+  Element,
+  nodesFromString,
+} from "https://deno.land/x/deno_dom@v0.1.38/deno-dom-wasm.ts";
 import {
   Template,
   getAttributeKeys,
@@ -337,6 +341,72 @@ Deno.test("`templateRenderer.paragraph` renders received parameters", () => {
     `<p data-decor-content="content">Sphinx of black quartz, judge my vow.</p>`
   );
 });
+
+Deno.test(
+  "`templateRenderer.tablecell` renders received parameters as header cell when header is true",
+  () => {
+    const document = new DOMParser().parseFromString(
+      '<table><tr><th data-decor-content="content" data-decor-attribute-align="align">The quick brown fox jumps over the lazy dog.</th></tr></table>',
+      "text/html"
+    )!;
+    const tableHeaderCellTemplate = document.body.getElementsByTagName("th")[0];
+
+    assertEquals(
+      templateRenderer({
+        ...testTemplate,
+        tableHeaderCell: tableHeaderCellTemplate,
+      }).tablecell("Sphinx of black quartz, judge my vow.", {
+        header: true,
+        align: "center",
+      }),
+      '<th data-decor-content="content" data-decor-attribute-align="align" align="center">Sphinx of black quartz, judge my vow.</th>'
+    );
+  }
+);
+
+Deno.test(
+  "`templateRenderer.tablecell` renders received parameters as row cell when header is false",
+  () => {
+    const document = new DOMParser().parseFromString(
+      '<table><tr><td data-decor-content="content" data-decor-attribute-align="align">The quick brown fox jumps over the lazy dog.</td></tr></table>',
+      "text/html"
+    )!;
+    const tableRowCellTemplate = document.body.getElementsByTagName("td")[0];
+
+    assertEquals(
+      templateRenderer({
+        ...testTemplate,
+        tableRowCell: tableRowCellTemplate,
+      }).tablecell("Sphinx of black quartz, judge my vow.", {
+        header: false,
+        align: "center",
+      }),
+      '<td data-decor-content="content" data-decor-attribute-align="align" align="center">Sphinx of black quartz, judge my vow.</td>'
+    );
+  }
+);
+
+Deno.test(
+  "`templateRenderer.tablecell` doesn't render `align` attribute when null is given",
+  () => {
+    const document = new DOMParser().parseFromString(
+      '<table><tr><td data-decor-content="content" data-decor-attribute-align="align">The quick brown fox jumps over the lazy dog.</td></tr></table>',
+      "text/html"
+    )!;
+    const tableRowCellTemplate = document.body.getElementsByTagName("td")[0];
+
+    assertEquals(
+      templateRenderer({
+        ...testTemplate,
+        tableRowCell: tableRowCellTemplate,
+      }).tablecell("Sphinx of black quartz, judge my vow.", {
+        header: false,
+        align: null,
+      }),
+      '<td data-decor-content="content" data-decor-attribute-align="align">Sphinx of black quartz, judge my vow.</td>'
+    );
+  }
+);
 
 Deno.test("`templateRenderer.strong` renders received parameters", () => {
   const document = new DOMParser().parseFromString(

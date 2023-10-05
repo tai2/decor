@@ -44,7 +44,7 @@ export function getAttributeKeys(template: Element): string[] {
       }
     }
     for (const child of element.children) {
-      getAttributeKeysInner(child as Element, keys);
+      getAttributeKeysInner(child, keys);
     }
   }
 
@@ -276,10 +276,6 @@ export function templateRenderer(template: Template): Renderer {
         } as const;
       }
 
-      console.log(
-        "outerHTML",
-        cloneTemplateThenApplyParameters("orderedList", parameters).outerHTML
-      );
       return ordered
         ? cloneTemplateThenApplyParameters("orderedList", parameters).outerHTML
         : cloneTemplateThenApplyParameters("unorderedList", parameters)
@@ -327,7 +323,40 @@ export function templateRenderer(template: Template): Renderer {
     },
     table: () => "",
     tablerow: (content) => content,
-    tablecell: (content) => content,
+    tablecell: (
+      content: string,
+      flags: {
+        header: boolean;
+        align: "center" | "left" | "right" | null;
+      }
+    ) => {
+      const parameters: Parameters = {
+        content: {
+          value: content,
+          destination: {
+            type: "content",
+          },
+          isReferenced: false,
+        },
+      } as const;
+
+      if (flags.align) {
+        parameters.align = {
+          value: flags.align,
+          destination: {
+            type: "attribute",
+            default: "align",
+          },
+          isReferenced: false,
+        };
+      }
+
+      return flags.header
+        ? cloneTemplateThenApplyParameters("tableHeaderCell", parameters)
+            .outerHTML
+        : cloneTemplateThenApplyParameters("tableRowCell", parameters)
+            .outerHTML;
+    },
     strong: (text: string) => {
       const parameters = {
         content: {
