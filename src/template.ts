@@ -1,7 +1,7 @@
 import { Element } from "./deps/deno-dom.ts";
 
 // Having snake case property names brings a benefit that we can look up templates from a template
-//  HTML using keys of this type since `data-decor-element` is defined in snake case.
+// HTML using keys of this type since `data-decor-element` is defined in snake case.
 export type Template = {
   heading1: Element;
   heading2: Element;
