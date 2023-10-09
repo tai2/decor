@@ -366,6 +366,25 @@ Deno.test(
 );
 
 Deno.test(
+  "`templateRenderer.tablerow` renders received parameters as row when header is false",
+  () => {
+    const tableRowTemplate = parseDomFragment(
+      '<table><tr data-decor-content="content"><td>The quick brown fox jumps over the lazy dog.</td></tr></table>'
+    ).getElementsByTagName("tr")[0];
+
+    assertEquals(
+      templateRenderer({
+        ...testTemplate,
+        tableRow: tableRowTemplate,
+      }).tablerow("<td>Sphinx of black quartz, judge my vow.</td>", {
+        header: false,
+      }),
+      '<tr data-decor-content="content"><td>Sphinx of black quartz, judge my vow.</td></tr>'
+    );
+  }
+);
+
+Deno.test(
   "`templateRenderer.tablecell` renders received parameters as header cell when header is true",
   () => {
     const tableHeaderCellTemplate = parseDomFragment(
