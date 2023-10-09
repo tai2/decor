@@ -1,11 +1,7 @@
 import { assertEquals } from "https://deno.land/std@0.202.0/assert/mod.ts";
 import { DOMParser, Element } from "./deps/deno-dom.ts";
-
-import {
-  Template,
-  getAttributeKeys,
-  templateRenderer,
-} from "./template_renderer.ts";
+import { Template } from "./template.ts";
+import { getAttributeKeys, templateRenderer } from "./template_renderer.ts";
 
 const divElement = parseDomFragment("<div></div>").children[0];
 
@@ -16,27 +12,27 @@ const testTemplate: Template = {
   heading4: divElement,
   heading5: divElement,
   heading6: divElement,
-  thematicBreak: divElement,
+  thematic_break: divElement,
   paragraph: divElement,
-  codeBlock: divElement,
-  blockQuote: divElement,
+  code_block: divElement,
+  block_quote: divElement,
   table: divElement,
-  tableHeader: divElement,
-  tableHeaderCell: divElement,
-  tableRow: divElement,
-  tableRowCell: divElement,
-  orderedList: divElement,
-  orderedListItem: divElement,
-  unorderedList: divElement,
-  unorderedListItem: divElement,
+  table_header: divElement,
+  table_header_cell: divElement,
+  table_row: divElement,
+  table_row_cell: divElement,
+  ordered_list: divElement,
+  ordered_list_item: divElement,
+  unordered_list: divElement,
+  unordered_list_item: divElement,
   link: divElement,
   image: divElement,
   video: divElement,
-  codeSpan: divElement,
+  code_span: divElement,
   emphasis: divElement,
-  strongEmphasis: divElement,
+  strong_emphasis: divElement,
   strikethrough: divElement,
-  hardLineBreak: divElement,
+  hard_line_break: divElement,
 };
 
 // This function makes it easy to switch DOM implementation.
@@ -82,7 +78,7 @@ console.log("Hello, World!");
   ).children[0];
 
   assertEquals(
-    templateRenderer({ ...testTemplate, codeBlock: codeBlockTemplate }).code(
+    templateRenderer({ ...testTemplate, code_block: codeBlockTemplate }).code(
       'alert("Hello, World!");',
       "javascript",
       false
@@ -105,7 +101,7 @@ console.log("Hello, World!");
     ).children[0];
 
     assertEquals(
-      templateRenderer({ ...testTemplate, codeBlock: codeBlockTemplate }).code(
+      templateRenderer({ ...testTemplate, code_block: codeBlockTemplate }).code(
         'alert("Hello, World!");',
         "javascript",
         false
@@ -126,7 +122,7 @@ The quick brown fox jumps over the lazy dog.
   assertEquals(
     templateRenderer({
       ...testTemplate,
-      blockQuote: blockQuoteTemplate,
+      block_quote: blockQuoteTemplate,
     }).blockquote("Sphinx of black quartz, judge my vow."),
     `<blockquote data-decor-content="content">Sphinx of black quartz, judge my vow.</blockquote>`
   );
@@ -144,7 +140,7 @@ The quick brown fox jumps over the lazy dog.
     assertEquals(
       templateRenderer({
         ...testTemplate,
-        blockQuote: blockQuoteTemplate,
+        block_quote: blockQuoteTemplate,
       }).blockquote("Sphinx of black quartz, judge my vow."),
       `<blockquote data-decor-attribute-title="content" title="Sphinx of black quartz, judge my vow.">
 The quick brown fox jumps over the lazy dog.
@@ -200,7 +196,7 @@ Deno.test("`templateRenderer.hr` renders the given template", () => {
   assertEquals(
     templateRenderer({
       ...testTemplate,
-      thematicBreak: thematicBreakTemplate,
+      thematic_break: thematicBreakTemplate,
     }).hr(),
     `<hr>`
   );
@@ -216,7 +212,7 @@ Deno.test(
     assertEquals(
       templateRenderer({
         ...testTemplate,
-        orderedList: orderedListTemplate,
+        ordered_list: orderedListTemplate,
       }).list("<li>number 1</li>", true, 2),
       `<ol data-decor-content="content" data-decor-attribute-start="start" start="2"><li>number 1</li></ol>`
     );
@@ -233,7 +229,7 @@ Deno.test(
     assertEquals(
       templateRenderer({
         ...testTemplate,
-        orderedList: orderedListTemplate,
+        ordered_list: orderedListTemplate,
       }).list("<li>number 1</li>", true, 1),
       `<ol data-decor-content="content" data-decor-attribute-start="start"><li>number 1</li></ol>`
     );
@@ -250,7 +246,7 @@ Deno.test(
     assertEquals(
       templateRenderer({
         ...testTemplate,
-        unorderedList: unorderedListTemplate,
+        unordered_list: unorderedListTemplate,
       }).list("<li>This is a list item</li>", false, ""),
       `<ul data-decor-content="content"><li>This is a list item</li></ul>`
     );
@@ -267,7 +263,7 @@ Deno.test(
     assertEquals(
       templateRenderer({
         ...testTemplate,
-        orderedListItem: orderedListItemTemplate,
+        ordered_list_item: orderedListItemTemplate,
       }).listitem("Sphinx of black quartz, judge my vow.", true, false, false),
       `<li data-decor-content="content">Sphinx of black quartz, judge my vow.</li>`
     );
@@ -284,7 +280,7 @@ Deno.test(
     assertEquals(
       templateRenderer({
         ...testTemplate,
-        unorderedListItem: unorderedListItemTemplate,
+        unordered_list_item: unorderedListItemTemplate,
       }).listitem("Sphinx of black quartz, judge my vow.", false, false, false),
       `<li data-decor-content="content">Sphinx of black quartz, judge my vow.</li>`
     );
@@ -337,7 +333,7 @@ Deno.test(
     assertEquals(
       templateRenderer({
         ...testTemplate,
-        tableHeader: tableHeaderTemplate,
+        table_header: tableHeaderTemplate,
       }).tablerow("<th>Sphinx of black quartz, judge my vow.</th>", {
         header: true,
       }),
@@ -356,7 +352,7 @@ Deno.test(
     assertEquals(
       templateRenderer({
         ...testTemplate,
-        tableHeader: tableHeaderTemplate,
+        table_header: tableHeaderTemplate,
       }).tablerow("<th>Sphinx of black quartz, judge my vow.</th>", {
         header: true,
       }),
@@ -375,7 +371,7 @@ Deno.test(
     assertEquals(
       templateRenderer({
         ...testTemplate,
-        tableRow: tableRowTemplate,
+        table_row: tableRowTemplate,
       }).tablerow("<td>Sphinx of black quartz, judge my vow.</td>", {
         header: false,
       }),
@@ -394,7 +390,7 @@ Deno.test(
     assertEquals(
       templateRenderer({
         ...testTemplate,
-        tableHeaderCell: tableHeaderCellTemplate,
+        table_header_cell: tableHeaderCellTemplate,
       }).tablecell("Sphinx of black quartz, judge my vow.", {
         header: true,
         align: "center",
@@ -414,7 +410,7 @@ Deno.test(
     assertEquals(
       templateRenderer({
         ...testTemplate,
-        tableRowCell: tableRowCellTemplate,
+        table_row_cell: tableRowCellTemplate,
       }).tablecell("Sphinx of black quartz, judge my vow.", {
         header: false,
         align: "center",
@@ -434,7 +430,7 @@ Deno.test(
     assertEquals(
       templateRenderer({
         ...testTemplate,
-        tableRowCell: tableRowCellTemplate,
+        table_row_cell: tableRowCellTemplate,
       }).tablecell("Sphinx of black quartz, judge my vow.", {
         header: false,
         align: null,
@@ -452,7 +448,7 @@ Deno.test("`templateRenderer.strong` renders received parameters", () => {
   assertEquals(
     templateRenderer({
       ...testTemplate,
-      strongEmphasis: strongEmphasisTemplate,
+      strong_emphasis: strongEmphasisTemplate,
     }).strong("Sphinx of black quartz, judge my vow."),
     `<strong data-decor-content="content">Sphinx of black quartz, judge my vow.</strong>`
   );
@@ -480,7 +476,7 @@ Deno.test("`templateRenderer.codespan` renders received parameters", () => {
   assertEquals(
     templateRenderer({
       ...testTemplate,
-      codeSpan: codeSpanTemplate,
+      code_span: codeSpanTemplate,
     }).codespan("Sphinx of black quartz, judge my vow."),
     `<code data-decor-content="content">Sphinx of black quartz, judge my vow.</code>`
   );
@@ -492,7 +488,7 @@ Deno.test("`templateRenderer.br` renders the given template", () => {
   assertEquals(
     templateRenderer({
       ...testTemplate,
-      hardLineBreak: hardLineBreakTemplate,
+      hard_line_break: hardLineBreakTemplate,
     }).br(),
     `<br>`
   );
@@ -564,7 +560,7 @@ example
 
     const renderer = templateRenderer({
       ...testTemplate,
-      codeBlock: codeBlockTemplate,
+      code_block: codeBlockTemplate,
       link: linkTemplate,
     });
 

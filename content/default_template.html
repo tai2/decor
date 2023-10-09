@@ -5,7 +5,148 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   </head>
   <body>
-    <h1 data-decor-element="headding1">Primary Headding</h1>
-    <h2 data-decor-element="headding2">Secondary Headding</h2>
+    <h1 data-decor-element="headding1">Block Elements</h1>
+    <h2 data-decor-element="headding2">A Second Level Header</h2>
+    <h3 data-decor-element="headding3">A Third Level Header</h3>
+    <h4 data-decor-element="headding4">A Forth Level Header</h4>
+    <h5 data-decor-element="headding5">A Fifth Level Header</h5>
+    <h6 data-decor-element="headding6">A Sixth Level Header</h6>
+
+    <h2>Paragraph</h2>
+    <p data-decor-element="paragraph">
+      The quick brown fox jumps over the lazy dog.
+    </p>
+
+    <h2>Code Block</h2>
+    <pre
+      data-decor-element="code_block"
+    ><code data-decor-content="content" data-decor-attribute-data-lang="infoString">for (var i = 1; i &lt; 101; i++) {
+    if (i % 15 == 0) console.log(&quot;FizzBuzz&quot;);
+    else if (i % 3 == 0) console.log(&quot;Fizz&quot;);
+    else if (i % 5 == 0) console.log(&quot;Buzz&quot;);
+    else console.log(i);
+}</code></pre>
+
+    <h2>Table</h2>
+
+    <table data-decor-element="table">
+      <thead data-decor-content="header">
+        <tr data-decor-element="table_header">
+          <th data-decor-element="table_header_cell">Library</th>
+          <th>Language</th>
+          <th>Parser</th>
+          <th>Renderer</th>
+          <th>Extensions</th>
+          <th>Plugins</th>
+          <th>License</th>
+        </tr>
+      </thead>
+      <tbody data-decor-content="body">
+        <tr data-decor-element="table_row">
+          <td data-decor-element="table_row_cell">Marked</td>
+          <td>JavaScript</td>
+          <td>Custom</td>
+          <td>Custom</td>
+          <td>GitHub Flavored Markdown</td>
+          <td>Yes</td>
+          <td>MIT</td>
+        </tr>
+        <tr>
+          <td>Remark</td>
+          <td>JavaScript</td>
+          <td>Unified</td>
+          <td>Custom</td>
+          <td>CommonMark, GitHub Flavored Markdown, others</td>
+          <td>Yes</td>
+          <td>MIT</td>
+        </tr>
+        <tr>
+          <td>Markdown-it</td>
+          <td>JavaScript</td>
+          <td>Custom</td>
+          <td>Custom</td>
+          <td>CommonMark, GitHub Flavored Markdown, others</td>
+          <td>Yes</td>
+          <td>MIT</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>List</h2>
+    <ul data-decor-element="unordered_list">
+      <li data-decor-element="unordered_list_item">List Item 1</li>
+      <li>List Item 2</li>
+      <li>List Item 3</li>
+    </ul>
+    <ol data-decor-element="ordered_list">
+      <li data-decor-element="ordered_list_item">List Item 1</li>
+      <li>List Item 2</li>
+      <li>List Item 3</li>
+    </ol>
+
+    <h2>Block Quote</h2>
+    <blockquote data-decor-element="block_quote">
+      <p>
+        Words can be like X-rays, if you use them properly—they’ll go through
+        anything. You read and you’re pierced.
+      </p>
+    </blockquote>
+
+    <h2>Thematic break</h2>
+    <hr data-decor-element="thematic_break" />
+
+    <h1>Inline Elements</h1>
+
+    <h2>Link</h2>
+    <p>This is <a href="http://example.com/">an example</a> inline link.</p>
+
+    <h2>Image</h2>
+    <p>
+      <img
+        width="300px"
+        src="https://raw.githubusercontent.com/tai2/decor/main/content/sample-5.jpg"
+        alt="sample image"
+      />
+    </p>
+
+    <h2>Video</h2>
+    <video controls width="300px">
+      <source
+        data-decor-attribute-src="url"
+        src="https://raw.githubusercontent.com/tai2/decor/main/content/sample-5s.mp4"
+      />
+      <a data-decor-attribute-href="url" data-decor-content="description"
+        >link text</a
+      >
+    </video>
+
+    <h2>Code Span</h2>
+    <p>
+      Use <code data-decor-element="code_span">status</code> to list all new or
+      modified files that haven't yet been committed.
+    </p>
+
+    <h2>Emphasis</h2>
+    <p>
+      Some of these words <em data-decor-element="emphasis">are emphasized</em>.
+      Some of these words <em>are emphasized also</em>.
+    </p>
+    <p>
+      Use two asterisks for
+      <strong data-decor-element="strong_emphasis">strong emphasis</strong>. Or,
+      if you prefer, <strong>use two underscores instead</strong>.
+    </p>
+
+    <h2>Strikethrough</h2>
+    <p>
+      <del data-decor-element="trikethrough">Hi</del> Hello,
+      <del>there</del> world!
+    </p>
+
+    <h2>Hard line break</h2>
+    <p>
+      foo<br data-decor-element="hard_line_break" />
+      baz
+    </p>
   </body>
 </html>

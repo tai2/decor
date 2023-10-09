@@ -2,37 +2,8 @@ import { extname } from "https://deno.land/std@0.202.0/url/mod.ts";
 import { contentType } from "https://deno.land/std@0.203.0/media_types/mod.ts";
 import { Element } from "./deps/deno-dom.ts";
 import { escape, cleanUrl } from "./deps/marked.ts";
+import { Template } from "./template.ts";
 import { Renderer } from "./renderer.ts";
-
-export type Template = {
-  heading1: Element;
-  heading2: Element;
-  heading3: Element;
-  heading4: Element;
-  heading5: Element;
-  heading6: Element;
-  thematicBreak: Element;
-  paragraph: Element;
-  codeBlock: Element;
-  blockQuote: Element;
-  table: Element;
-  tableHeader: Element;
-  tableHeaderCell: Element;
-  tableRow: Element;
-  tableRowCell: Element;
-  orderedList: Element;
-  orderedListItem: Element;
-  unorderedList: Element;
-  unorderedListItem: Element;
-  link: Element;
-  image: Element;
-  video: Element;
-  codeSpan: Element;
-  emphasis: Element;
-  strongEmphasis: Element;
-  strikethrough: Element;
-  hardLineBreak: Element;
-};
 
 // Traverse the template and collect all attribute keys start with "data-decor-attribute-" and
 // return them as an array.
@@ -197,7 +168,7 @@ export function templateRenderer(template: Template): Renderer {
         },
       } as const;
 
-      return cloneTemplateThenApplyParameters("codeBlock", parameters)
+      return cloneTemplateThenApplyParameters("code_block", parameters)
         .outerHTML;
     },
     blockquote: (quote: string) => {
@@ -211,7 +182,7 @@ export function templateRenderer(template: Template): Renderer {
         },
       } as const;
 
-      return cloneTemplateThenApplyParameters("blockQuote", parameters)
+      return cloneTemplateThenApplyParameters("block_quote", parameters)
         .outerHTML;
     },
     html: (html: string, _block?: boolean) => {
@@ -252,7 +223,7 @@ export function templateRenderer(template: Template): Renderer {
       }
     },
     hr: () => {
-      return cloneTemplateThenApplyParameters("thematicBreak", {}).outerHTML;
+      return cloneTemplateThenApplyParameters("thematic_break", {}).outerHTML;
     },
     list: (body: string, ordered: boolean, start: number | "") => {
       const parameters: Parameters = {
@@ -277,8 +248,8 @@ export function templateRenderer(template: Template): Renderer {
       }
 
       return ordered
-        ? cloneTemplateThenApplyParameters("orderedList", parameters).outerHTML
-        : cloneTemplateThenApplyParameters("unorderedList", parameters)
+        ? cloneTemplateThenApplyParameters("ordered_list", parameters).outerHTML
+        : cloneTemplateThenApplyParameters("unordered_list", parameters)
             .outerHTML;
     },
     listitem: (
@@ -298,9 +269,9 @@ export function templateRenderer(template: Template): Renderer {
       } as const;
 
       return ordered
-        ? cloneTemplateThenApplyParameters("orderedListItem", parameters)
+        ? cloneTemplateThenApplyParameters("ordered_list_item", parameters)
             .outerHTML
-        : cloneTemplateThenApplyParameters("unorderedListItem", parameters)
+        : cloneTemplateThenApplyParameters("unordered_list_item", parameters)
             .outerHTML;
     },
     checkbox: (checked: boolean) => {
@@ -353,8 +324,8 @@ export function templateRenderer(template: Template): Renderer {
       } as const;
 
       return flags.header
-        ? cloneTemplateThenApplyParameters("tableHeader", parameters).outerHTML
-        : cloneTemplateThenApplyParameters("tableRow", parameters).outerHTML;
+        ? cloneTemplateThenApplyParameters("table_header", parameters).outerHTML
+        : cloneTemplateThenApplyParameters("table_row", parameters).outerHTML;
     },
     tablecell: (
       content: string,
@@ -385,9 +356,9 @@ export function templateRenderer(template: Template): Renderer {
       }
 
       return flags.header
-        ? cloneTemplateThenApplyParameters("tableHeaderCell", parameters)
+        ? cloneTemplateThenApplyParameters("table_header_cell", parameters)
             .outerHTML
-        : cloneTemplateThenApplyParameters("tableRowCell", parameters)
+        : cloneTemplateThenApplyParameters("table_row_cell", parameters)
             .outerHTML;
     },
     strong: (text: string) => {
@@ -401,7 +372,7 @@ export function templateRenderer(template: Template): Renderer {
         },
       } as const;
 
-      return cloneTemplateThenApplyParameters("strongEmphasis", parameters)
+      return cloneTemplateThenApplyParameters("strong_emphasis", parameters)
         .outerHTML;
     },
     em: (text: string) => {
@@ -428,10 +399,11 @@ export function templateRenderer(template: Template): Renderer {
         },
       } as const;
 
-      return cloneTemplateThenApplyParameters("codeSpan", parameters).outerHTML;
+      return cloneTemplateThenApplyParameters("code_span", parameters)
+        .outerHTML;
     },
     br: () => {
-      return cloneTemplateThenApplyParameters("hardLineBreak", {}).outerHTML;
+      return cloneTemplateThenApplyParameters("hard_line_break", {}).outerHTML;
     },
     del: (text: string) => {
       const parameters = {
