@@ -35,7 +35,7 @@ const testTemplate: Template = {
   codeSpan: divElement,
   emphasis: divElement,
   strongEmphasis: divElement,
-  strikeThrough: divElement,
+  strikethrough: divElement,
   hardLineBreak: divElement,
 };
 
@@ -499,14 +499,14 @@ Deno.test("`templateRenderer.br` renders the given template", () => {
 });
 
 Deno.test("`templateRenderer.del` renders received parameters", () => {
-  const strikeThroughTemplate = parseDomFragment(
+  const strikethroughTemplate = parseDomFragment(
     `<del data-decor-content="content">The quick brown fox jumps over the lazy dog.</del>`
   ).children[0];
 
   assertEquals(
     templateRenderer({
       ...testTemplate,
-      strikeThrough: strikeThroughTemplate,
+      strikethrough: strikethroughTemplate,
     }).del("Sphinx of black quartz, judge my vow."),
     `<del data-decor-content="content">Sphinx of black quartz, judge my vow.</del>`
   );

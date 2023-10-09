@@ -30,7 +30,7 @@ export type Template = {
   codeSpan: Element;
   emphasis: Element;
   strongEmphasis: Element;
-  strikeThrough: Element;
+  strikethrough: Element;
   hardLineBreak: Element;
 };
 
@@ -444,7 +444,7 @@ export function templateRenderer(template: Template): Renderer {
         },
       } as const;
 
-      return cloneTemplateThenApplyParameters("strikeThrough", parameters)
+      return cloneTemplateThenApplyParameters("strikethrough", parameters)
         .outerHTML;
     },
     link: (href: string, title: string | null | undefined, text: string) => {
