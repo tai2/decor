@@ -307,19 +307,44 @@ Deno.test("`templateRenderer.checkbox` makes it back to markdown", () => {
   );
 });
 
-Deno.test("`templateRenderer.paragraph` renders received parameters", () => {
-  const paragraphTemplate = parseDomFragment(
-    `<p data-decor-content="content">The quick brown fox jumps over the lazy dog.</p>`
+Deno.test("`templateRenderer.table` renders received parameters", () => {
+  const tableTemplate = parseDomFragment(
+    `<table>
+<thead data-decor-content="header"><tr><th>header</th></tr></thead>
+<tbody data-decor-content="body"><tr><td>body</td></tr></tbody>
+</table>`
   ).children[0];
 
   assertEquals(
     templateRenderer({
       ...testTemplate,
-      paragraph: paragraphTemplate,
-    }).paragraph("Sphinx of black quartz, judge my vow."),
-    `<p data-decor-content="content">Sphinx of black quartz, judge my vow.</p>`
+      table: tableTemplate,
+    }).table("<tr><th>title</th></tr>", "<tr><td>data</td></tr>"),
+    `<table>
+<thead data-decor-content="header"><tr><th>title</th></tr></thead>
+<tbody data-decor-content="body"><tr><td>data</td></tr></tbody>
+</table>`
   );
 });
+
+Deno.test(
+  "`templateRenderer.table` renders received parameters as header when header is true",
+  () => {
+    const tableHeaderTemplate = parseDomFragment(
+      '<table><tr data-decor-content="content"><th>The quick brown fox jumps over the lazy dog.</th></tr></table>'
+    ).getElementsByTagName("tr")[0];
+
+    assertEquals(
+      templateRenderer({
+        ...testTemplate,
+        tableHeader: tableHeaderTemplate,
+      }).tablerow("<th>Sphinx of black quartz, judge my vow.</th>", {
+        header: true,
+      }),
+      '<tr data-decor-content="content"><th>Sphinx of black quartz, judge my vow.</th></tr>'
+    );
+  }
+);
 
 Deno.test(
   "`templateRenderer.tablerow` renders received parameters as header when header is true",

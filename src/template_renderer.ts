@@ -321,7 +321,26 @@ export function templateRenderer(template: Template): Renderer {
       return cloneTemplateThenApplyParameters("paragraph", parameters)
         .outerHTML;
     },
-    table: () => "",
+    table: (header: string, body: string) => {
+      const parameters = {
+        header: {
+          value: header,
+          destination: {
+            type: "content",
+          },
+          isReferenced: false,
+        },
+        body: {
+          value: body,
+          destination: {
+            type: "content",
+          },
+          isReferenced: false,
+        },
+      } as const;
+
+      return cloneTemplateThenApplyParameters("table", parameters).outerHTML;
+    },
     tablerow: (content: string, flags: { header: boolean }) => {
       const parameters: Parameters = {
         content: {
