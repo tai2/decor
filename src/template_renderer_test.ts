@@ -1,5 +1,5 @@
 import { assertEquals } from "https://deno.land/std@0.202.0/assert/mod.ts";
-import { DOMParser } from "./deps/deno-dom.ts";
+import { DOMParser, Element } from "./deps/deno-dom.ts";
 
 import {
   Template,
@@ -7,10 +7,8 @@ import {
   templateRenderer,
 } from "./template_renderer.ts";
 
-const divElement = new DOMParser().parseFromString(
-  "<div></div>",
-  "text/html"
-)!.body;
+const divElement = parseDomFragment("<div></div>").children[0];
+
 const testTemplate: Template = {
   heading1: divElement,
   heading2: divElement,
@@ -41,10 +39,17 @@ const testTemplate: Template = {
   hardLineBreak: divElement,
 };
 
+// This function makes it easy to switch DOM implementation.
+// For example, JSDOM.fragment() returns DocumentFragment instead of Document.
+function parseDomFragment(text: string): Element {
+  const document = new DOMParser().parseFromString(text, "text/html")!;
+  return document.body;
+}
+
 Deno.test(
   "`getAttributeKeys` returns all attribute keys start with 'data-decor-attribute-' in the template",
   () => {
-    const document = new DOMParser().parseFromString(
+    const template = parseDomFragment(
       `<figure data-decor-element="image" data-decor-attribute-title="title" class="Figure">
         <img
             data-decor-attribute-src="url"
@@ -56,10 +61,9 @@ Deno.test(
         <figcaption data-decor-content="title" class="Figure-caption">
             The caption of the image
         </figcaption>
-        </figure>`,
-      "text/html"
-    )!;
-    const template = document.body.children[0];
+        </figure>`
+    ).children[0];
+
     assertEquals(getAttributeKeys(template), [
       "data-decor-attribute-title",
       "data-decor-attribute-src",
@@ -69,15 +73,13 @@ Deno.test(
 );
 
 Deno.test("`templateRenderer.code` renders received parameters", () => {
-  const document = new DOMParser().parseFromString(
+  const codeBlockTemplate = parseDomFragment(
     `<pre>
 <code data-decor-attribute-data-langauge="infoString" data-decor-content="content">
 console.log("Hello, World!");
 </code>
-</pre>`,
-    "text/html"
-  )!;
-  const codeBlockTemplate = document.body.children[0];
+</pre>`
+  ).children[0];
 
   assertEquals(
     templateRenderer({ ...testTemplate, codeBlock: codeBlockTemplate }).code(
@@ -94,15 +96,13 @@ console.log("Hello, World!");
 Deno.test(
   "`templateRenderer.code` renders received parameters to the root element when no specifier found",
   () => {
-    const document = new DOMParser().parseFromString(
+    const codeBlockTemplate = parseDomFragment(
       `<pre>
 <code>
 console.log("Hello, World!");
 </code>
-</pre>`,
-      "text/html"
-    )!;
-    const codeBlockTemplate = document.body.children[0];
+</pre>`
+    ).children[0];
 
     assertEquals(
       templateRenderer({ ...testTemplate, codeBlock: codeBlockTemplate }).code(
@@ -117,13 +117,11 @@ console.log("Hello, World!");
 );
 
 Deno.test("`templateRenderer.blockquote` renders received parameters", () => {
-  const document = new DOMParser().parseFromString(
+  const blockQuoteTemplate = parseDomFragment(
     `<blockquote data-decor-content="content">
 The quick brown fox jumps over the lazy dog.
-</blockquote>`,
-    "text/html"
-  )!;
-  const blockQuoteTemplate = document.body.children[0];
+</blockquote>`
+  ).children[0];
 
   assertEquals(
     templateRenderer({
@@ -137,13 +135,11 @@ The quick brown fox jumps over the lazy dog.
 Deno.test(
   "`templateRenderer.blockquote` can render content parameter to an attribute",
   () => {
-    const document = new DOMParser().parseFromString(
+    const blockQuoteTemplate = parseDomFragment(
       `<blockquote data-decor-attribute-title="content">
 The quick brown fox jumps over the lazy dog.
-</blockquote>`,
-      "text/html"
-    )!;
-    const blockQuoteTemplate = document.body.children[0];
+</blockquote>`
+    ).children[0];
 
     assertEquals(
       templateRenderer({
@@ -167,24 +163,23 @@ Deno.test("`templateRenderer.html` renders HTML as it is", () => {
 });
 
 Deno.test("`templateRenderer.heading` renders received parameters", () => {
-  const document = new DOMParser().parseFromString(
+  const fragment = parseDomFragment(
     `<h1 data-decor-content="content">Headding 1</h1>
     <h2 data-decor-content="content">Headding 2</h2>
     <h3 data-decor-content="content">Headding 3</h3>
     <h4 data-decor-content="content">Headding 4</h4>
     <h5 data-decor-content="content">Headding 5</h5>
-    <h6 data-decor-content="content">Headding 6</h6>`,
-    "text/html"
-  )!;
+    <h6 data-decor-content="content">Headding 6</h6>`
+  );
 
   const renderer = templateRenderer({
     ...testTemplate,
-    heading1: document.body.children[0],
-    heading2: document.body.children[1],
-    heading3: document.body.children[2],
-    heading4: document.body.children[3],
-    heading5: document.body.children[4],
-    heading6: document.body.children[5],
+    heading1: fragment.children[0],
+    heading2: fragment.children[1],
+    heading3: fragment.children[2],
+    heading4: fragment.children[3],
+    heading5: fragment.children[4],
+    heading6: fragment.children[5],
   });
 
   for (let i = 1; i <= 6; i++) {
@@ -200,8 +195,7 @@ Deno.test("`templateRenderer.heading` renders received parameters", () => {
 });
 
 Deno.test("`templateRenderer.hr` renders the given template", () => {
-  const document = new DOMParser().parseFromString(`<hr>`, "text/html")!;
-  const thematicBreakTemplate = document.body.children[0];
+  const thematicBreakTemplate = parseDomFragment(`<hr>`).children[0];
 
   assertEquals(
     templateRenderer({
@@ -215,11 +209,9 @@ Deno.test("`templateRenderer.hr` renders the given template", () => {
 Deno.test(
   "`templateRenderer.list` renders received parameters as orderd list when ordered is true",
   () => {
-    const document = new DOMParser().parseFromString(
-      `<ol data-decor-content="content" data-decor-attribute-start="start"><li>item</li></ol>`,
-      "text/html"
-    )!;
-    const orderedListTemplate = document.body.children[0];
+    const orderedListTemplate = parseDomFragment(
+      `<ol data-decor-content="content" data-decor-attribute-start="start"><li>item</li></ol>`
+    ).children[0];
 
     assertEquals(
       templateRenderer({
@@ -234,11 +226,9 @@ Deno.test(
 Deno.test(
   "`templateRenderer.list` doesn't render start attribute when start is 1",
   () => {
-    const document = new DOMParser().parseFromString(
-      `<ol data-decor-content="content" data-decor-attribute-start="start"><li>item</li></ol>`,
-      "text/html"
-    )!;
-    const orderedListTemplate = document.body.children[0];
+    const orderedListTemplate = parseDomFragment(
+      `<ol data-decor-content="content" data-decor-attribute-start="start"><li>item</li></ol>`
+    ).children[0];
 
     assertEquals(
       templateRenderer({
@@ -253,11 +243,9 @@ Deno.test(
 Deno.test(
   "`templateRenderer.list` renders received parameters as unorderd list when ordered is false",
   () => {
-    const document = new DOMParser().parseFromString(
-      `<ul data-decor-content="content"><li>item</li></ul>`,
-      "text/html"
-    )!;
-    const unorderedListTemplate = document.body.children[0];
+    const unorderedListTemplate = parseDomFragment(
+      `<ul data-decor-content="content"><li>item</li></ul>`
+    ).children[0];
 
     assertEquals(
       templateRenderer({
@@ -272,11 +260,9 @@ Deno.test(
 Deno.test(
   "`templateRenderer.listitem` renders received parameters as orderd list item when ordered is true",
   () => {
-    const document = new DOMParser().parseFromString(
-      `<li data-decor-content="content">The quick brown fox jumps over the lazy dog.</li>`,
-      "text/html"
-    )!;
-    const orderedListItemTemplate = document.body.children[0];
+    const orderedListItemTemplate = parseDomFragment(
+      `<li data-decor-content="content">The quick brown fox jumps over the lazy dog.</li>`
+    ).children[0];
 
     assertEquals(
       templateRenderer({
@@ -291,11 +277,9 @@ Deno.test(
 Deno.test(
   "`templateRenderer.listitem` renders received parameters as unorderd list item when ordered is false",
   () => {
-    const document = new DOMParser().parseFromString(
-      `<li data-decor-content="content">The quick brown fox jumps over the lazy dog.</li>`,
-      "text/html"
-    )!;
-    const unorderedListItemTemplate = document.body.children[0];
+    const unorderedListItemTemplate = parseDomFragment(
+      `<li data-decor-content="content">The quick brown fox jumps over the lazy dog.</li>`
+    ).children[0];
 
     assertEquals(
       templateRenderer({
@@ -324,11 +308,9 @@ Deno.test("`templateRenderer.checkbox` makes it back to markdown", () => {
 });
 
 Deno.test("`templateRenderer.paragraph` renders received parameters", () => {
-  const document = new DOMParser().parseFromString(
-    `<p data-decor-content="content">The quick brown fox jumps over the lazy dog.</p>`,
-    "text/html"
-  )!;
-  const paragraphTemplate = document.body.children[0];
+  const paragraphTemplate = parseDomFragment(
+    `<p data-decor-content="content">The quick brown fox jumps over the lazy dog.</p>`
+  ).children[0];
 
   assertEquals(
     templateRenderer({
@@ -340,13 +322,30 @@ Deno.test("`templateRenderer.paragraph` renders received parameters", () => {
 });
 
 Deno.test(
+  "`templateRenderer.tablerow` renders received parameters as header when header is true",
+  () => {
+    const tableHeaderTemplate = parseDomFragment(
+      '<table><tr data-decor-content="content"><th>The quick brown fox jumps over the lazy dog.</th></tr></table>'
+    ).getElementsByTagName("tr")[0];
+
+    assertEquals(
+      templateRenderer({
+        ...testTemplate,
+        tableHeader: tableHeaderTemplate,
+      }).tablerow("<th>Sphinx of black quartz, judge my vow.</th>", {
+        header: true,
+      }),
+      '<tr data-decor-content="content"><th>Sphinx of black quartz, judge my vow.</th></tr>'
+    );
+  }
+);
+
+Deno.test(
   "`templateRenderer.tablecell` renders received parameters as header cell when header is true",
   () => {
-    const document = new DOMParser().parseFromString(
-      '<table><tr><th data-decor-content="content" data-decor-attribute-align="align">The quick brown fox jumps over the lazy dog.</th></tr></table>',
-      "text/html"
-    )!;
-    const tableHeaderCellTemplate = document.body.getElementsByTagName("th")[0];
+    const tableHeaderCellTemplate = parseDomFragment(
+      '<table><tr><th data-decor-content="content" data-decor-attribute-align="align">The quick brown fox jumps over the lazy dog.</th></tr></table>'
+    ).getElementsByTagName("th")[0];
 
     assertEquals(
       templateRenderer({
@@ -364,11 +363,9 @@ Deno.test(
 Deno.test(
   "`templateRenderer.tablecell` renders received parameters as row cell when header is false",
   () => {
-    const document = new DOMParser().parseFromString(
-      '<table><tr><td data-decor-content="content" data-decor-attribute-align="align">The quick brown fox jumps over the lazy dog.</td></tr></table>',
-      "text/html"
-    )!;
-    const tableRowCellTemplate = document.body.getElementsByTagName("td")[0];
+    const tableRowCellTemplate = parseDomFragment(
+      '<table><tr><td data-decor-content="content" data-decor-attribute-align="align">The quick brown fox jumps over the lazy dog.</td></tr></table>'
+    ).getElementsByTagName("td")[0];
 
     assertEquals(
       templateRenderer({
@@ -386,11 +383,9 @@ Deno.test(
 Deno.test(
   "`templateRenderer.tablecell` doesn't render `align` attribute when null is given",
   () => {
-    const document = new DOMParser().parseFromString(
-      '<table><tr><td data-decor-content="content" data-decor-attribute-align="align">The quick brown fox jumps over the lazy dog.</td></tr></table>',
-      "text/html"
-    )!;
-    const tableRowCellTemplate = document.body.getElementsByTagName("td")[0];
+    const tableRowCellTemplate = parseDomFragment(
+      '<table><tr><td data-decor-content="content" data-decor-attribute-align="align">The quick brown fox jumps over the lazy dog.</td></tr></table>'
+    ).getElementsByTagName("td")[0];
 
     assertEquals(
       templateRenderer({
@@ -406,11 +401,9 @@ Deno.test(
 );
 
 Deno.test("`templateRenderer.strong` renders received parameters", () => {
-  const document = new DOMParser().parseFromString(
-    `<strong data-decor-content="content">The quick brown fox jumps over the lazy dog.</strong>`,
-    "text/html"
-  )!;
-  const strongEmphasisTemplate = document.body.children[0];
+  const strongEmphasisTemplate = parseDomFragment(
+    `<strong data-decor-content="content">The quick brown fox jumps over the lazy dog.</strong>`
+  ).children[0];
 
   assertEquals(
     templateRenderer({
@@ -422,11 +415,9 @@ Deno.test("`templateRenderer.strong` renders received parameters", () => {
 });
 
 Deno.test("`templateRenderer.em` renders received parameters", () => {
-  const document = new DOMParser().parseFromString(
-    `<em data-decor-content="content">The quick brown fox jumps over the lazy dog.</em>`,
-    "text/html"
-  )!;
-  const emphasisTemplate = document.body.children[0];
+  const emphasisTemplate = parseDomFragment(
+    `<em data-decor-content="content">The quick brown fox jumps over the lazy dog.</em>`
+  ).children[0];
 
   assertEquals(
     templateRenderer({
@@ -438,11 +429,9 @@ Deno.test("`templateRenderer.em` renders received parameters", () => {
 });
 
 Deno.test("`templateRenderer.codespan` renders received parameters", () => {
-  const document = new DOMParser().parseFromString(
-    `<code data-decor-content="content">The quick brown fox jumps over the lazy dog.</code>`,
-    "text/html"
-  )!;
-  const codeSpanTemplate = document.body.children[0];
+  const codeSpanTemplate = parseDomFragment(
+    `<code data-decor-content="content">The quick brown fox jumps over the lazy dog.</code>`
+  ).children[0];
 
   assertEquals(
     templateRenderer({
@@ -454,8 +443,7 @@ Deno.test("`templateRenderer.codespan` renders received parameters", () => {
 });
 
 Deno.test("`templateRenderer.br` renders the given template", () => {
-  const document = new DOMParser().parseFromString(`<br>`, "text/html")!;
-  const hardLineBreakTemplate = document.body.children[0];
+  const hardLineBreakTemplate = parseDomFragment(`<br>`).children[0];
 
   assertEquals(
     templateRenderer({
@@ -467,11 +455,9 @@ Deno.test("`templateRenderer.br` renders the given template", () => {
 });
 
 Deno.test("`templateRenderer.del` renders received parameters", () => {
-  const document = new DOMParser().parseFromString(
-    `<del data-decor-content="content">The quick brown fox jumps over the lazy dog.</del>`,
-    "text/html"
-  )!;
-  const strikeThroughTemplate = document.body.children[0];
+  const strikeThroughTemplate = parseDomFragment(
+    `<del data-decor-content="content">The quick brown fox jumps over the lazy dog.</del>`
+  ).children[0];
 
   assertEquals(
     templateRenderer({
@@ -483,13 +469,11 @@ Deno.test("`templateRenderer.del` renders received parameters", () => {
 });
 
 Deno.test("`templateRenderer.link` renders received parameters", () => {
-  const document = new DOMParser().parseFromString(
+  const linkTemplate = parseDomFragment(
     `<a data-decor-attribute-href="url" data-decor-attribute-title="title" data-decor-content="content">
 example
-</a>`,
-    "text/html"
-  )!;
-  const linkTemplate = document.body.children[0];
+</a>`
+  ).children[0];
 
   assertEquals(
     templateRenderer({
@@ -501,13 +485,11 @@ example
 });
 
 Deno.test("`templateRenderer.link` omits title when it's not provided", () => {
-  const document = new DOMParser().parseFromString(
+  const linkTemplate = parseDomFragment(
     `<a data-decor-attribute-href="url" data-decor-attribute-title="title" data-decor-content="content">
 example
-</a>`,
-    "text/html"
-  )!;
-  const linkTemplate = document.body.children[0];
+</a>`
+  ).children[0];
 
   assertEquals(
     templateRenderer({
@@ -521,7 +503,7 @@ example
 Deno.test(
   "successive calls of two different render methods works correctly (meant fo attribute key cache)",
   () => {
-    const document = new DOMParser().parseFromString(
+    const fragment = parseDomFragment(
       `<pre>
 <code>
 console.log("Hello, World!");
@@ -530,12 +512,11 @@ console.log("Hello, World!");
 <a href data-decor-attribute-href="url" data-decor-attribute-title="title" data-decor-content="content">
 example
 </a>
-`,
-      "text/html"
-    )!;
+`
+    );
 
-    const codeBlockTemplate = document.body.children[0];
-    const linkTemplate = document.body.children[1];
+    const codeBlockTemplate = fragment.children[0];
+    const linkTemplate = fragment.children[1];
 
     const renderer = templateRenderer({
       ...testTemplate,
@@ -557,11 +538,9 @@ example
 Deno.test(
   "`templateRenderer.image` renders received parameters with image template when the file extention is a image one",
   () => {
-    const document = new DOMParser().parseFromString(
-      `<img data-decor-attribute-src="url" data-decor-attribute-title="title" data-decor-attribute-alt="description">`,
-      "text/html"
-    )!;
-    const imageTemplate = document.body.children[0];
+    const imageTemplate = parseDomFragment(
+      `<img data-decor-attribute-src="url" data-decor-attribute-title="title" data-decor-attribute-alt="description">`
+    ).children[0];
 
     assertEquals(
       templateRenderer({
@@ -576,14 +555,12 @@ Deno.test(
 Deno.test(
   "`templateRenderer.image` renders received parameters with video template when the file extention is a video one",
   () => {
-    const document = new DOMParser().parseFromString(
+    const videoTemplate = parseDomFragment(
       `<video data-decor-attribute-title="title">
 <source data-decor-attribute-src="url">
 <a data-decor-attribute-href="url" data-decor-content="description">link text</a>
-</video>`,
-      "text/html"
-    )!;
-    const videoTemplate = document.body.children[0];
+</video>`
+    ).children[0];
 
     assertEquals(
       templateRenderer({
