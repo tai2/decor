@@ -1,12 +1,7 @@
-import { DOMParser } from "./deps/deno-dom.ts";
+import { DOMParser, HTMLDocument } from "./deps/deno-dom.ts";
 import { Template } from "./template.ts";
 
-export function parseTemplate(templateString: string): Template {
-  const document = new DOMParser().parseFromString(templateString, "text/html");
-  if (!document) {
-    throw new Error("Failed to parse template");
-  }
-
+export function extractTemplate(templateDocument: HTMLDocument): Template {
   const emptyFragment = new DOMParser().parseFromString(
     "<div></div>",
     "text/html"
@@ -42,19 +37,21 @@ export function parseTemplate(templateString: string): Template {
     hard_line_break: emptyFragment,
   };
 
-  const lackingElements: Array<keyof Template> = [];
+  const missingElements: Array<keyof Template> = [];
   for (const key of Object.keys(template) as Array<keyof Template>) {
-    const fragment = document.querySelector(`[data-decor-element=${key}]`);
+    const fragment = templateDocument.querySelector(
+      `[data-decor-element=${key}]`
+    );
     if (!fragment) {
-      lackingElements.push(key);
+      missingElements.push(key);
       continue;
     }
 
     template[key] = fragment;
   }
 
-  if (lackingElements.length > 0) {
-    throw new Error(`Missing elements in template: ${lackingElements}`);
+  if (missingElements.length > 0) {
+    throw new Error(`Missing elements in template: ${missingElements}`);
   }
 
   return template;

@@ -1,21 +1,45 @@
+import { parse } from "./deps/std/flags.ts";
 import { marked } from "./deps/marked.ts";
-import { parseTemplate } from "./parse_template.ts";
+import { DOMParser } from "./deps/deno-dom.ts";
+import { extractTemplate } from "./extract_template.ts";
 import { Parser } from "./parser.ts";
 import { templateRenderer } from "./template_renderer.ts";
 import assets from "./assets.json" assert { type: "json" };
-import { parse } from "./deps/std/flags.ts";
 
 function main() {
-  const template = parseTemplate(assets.defaultTemplate);
+  try {
+    const { _: inputs, ...options } = parse(Deno.args);
 
-  const renderer = templateRenderer(template);
+    // TODO: Add a test case for missing template file
+    let templateString = assets.defaultTemplate;
+    if (typeof options.template === "string") {
+      templateString = Deno.readTextFileSync(options.template);
+    }
 
-  const tokens = marked.lexer(assets.defaultContent);
+    const templateDocument = new DOMParser().parseFromString(
+      templateString,
+      "text/html"
+    );
+    if (!templateDocument) {
+      throw new Error("Failed to parse template");
+    }
 
-  const output = Parser.parse(renderer, tokens);
+    const template = extractTemplate(templateDocument);
 
-  console.dir(parse(Deno.args));
-  console.log(output);
+    const renderer = templateRenderer(template);
+
+    const tokens = marked.lexer(assets.defaultContent);
+
+    const output = Parser.parse(renderer, tokens);
+
+    //console.log(inputs, options);
+    templateDocument.body.innerHTML = output;
+    const htmlString =
+      "<!DOCTYPE html>\n" + templateDocument.documentElement?.outerHTML;
+    console.log(htmlString);
+  } catch (e) {
+    console.error(e.message);
+  }
 }
 
 main();
