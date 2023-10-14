@@ -1,4 +1,4 @@
-import { assertEquals } from "https://deno.land/std@0.202.0/assert/mod.ts";
+import { assertEquals } from "./deps/std/assert.ts";
 import { DOMParser, Element } from "./deps/deno-dom.ts";
 import { Template } from "./template.ts";
 import { getAttributeKeys, templateRenderer } from "./template_renderer.ts";

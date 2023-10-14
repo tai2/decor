@@ -1,5 +1,5 @@
-import { extname } from "https://deno.land/std@0.202.0/url/mod.ts";
-import { contentType } from "https://deno.land/std@0.203.0/media_types/mod.ts";
+import { extname } from "./deps/std/url.ts";
+import { contentType } from "./deps/std/media_types.ts";
 import { Element } from "./deps/deno-dom.ts";
 import { escape, cleanUrl } from "./deps/marked.ts";
 import { Template } from "./template.ts";

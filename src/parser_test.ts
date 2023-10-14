@@ -1,7 +1,4 @@
-import {
-  assertSpyCall,
-  spy,
-} from "https://deno.land/std@0.201.0/testing/mock.ts";
+import { assertSpyCall, spy } from "./deps/std/testing.ts";
 import { marked } from "./deps/marked.ts";
 import { Renderer } from "./renderer.ts";
 import { Parser } from "./parser.ts";

@@ -1,5 +1,5 @@
-import * as path from "https://deno.land/std@0.202.0/path/mod.ts";
-import { assertThrows } from "https://deno.land/std@0.202.0/assert/mod.ts";
+import * as path from "./deps/std/path.ts";
+import { assertThrows } from "./deps/std/assert.ts";
 import { DOMParser } from "./deps/deno-dom.ts";
 import { parseTemplate } from "./parse_template.ts";
 
