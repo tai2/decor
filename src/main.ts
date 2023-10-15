@@ -16,6 +16,11 @@ function main() {
       templateString = Deno.readTextFileSync(options.template);
     }
 
+    if (inputs.length === 0) {
+      // TODO: output usage to stderr when no inputs are given
+      Deno.exit(1);
+    }
+
     const templateDocument = new DOMParser().parseFromString(
       templateString,
       "text/html"
