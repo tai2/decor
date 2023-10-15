@@ -48,3 +48,38 @@ Deno.test("When no template file exists, decor raises an error", () => {
     "No such file or directory"
   );
 });
+
+Deno.test(
+  "decor emits output with a designated filename when --output is specified",
+  () => {
+    // Create temp directory
+    const tempDirPath = Deno.makeTempDirSync({
+      prefix: "decor_test_fixture",
+    });
+
+    // Prepare arguments
+    const outputPath = path.join(tempDirPath, "output.html");
+    const dirname = path.dirname(path.fromFileUrl(import.meta.url));
+    const inputPath = path.join(dirname, "../contents/default_content.md");
+
+    // Run decor
+    const { code } = runDecor(inputPath, "--output", outputPath);
+    assertEquals(code, 0);
+    assert(fs.existsSync(outputPath));
+
+    // Clean up temp directory
+    Deno.removeSync(tempDirPath, { recursive: true });
+  }
+);
+
+Deno.test(
+  "When --output is specified with multiple inputs, decor raises an error",
+  () => {
+    const { code, stderr } = runDecor("a.md", "b.md", "--output", "ouput.html");
+    assertEquals(code, 1);
+    assertStringIncludes(
+      new TextDecoder().decode(stderr),
+      "Cannot specify --output when generating multiple output files"
+    );
+  }
+);

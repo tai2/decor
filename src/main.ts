@@ -8,16 +8,24 @@ import assets from "./assets.json" assert { type: "json" };
 
 function main() {
   try {
-    const { _: inputs, ...options } = parse(Deno.args);
+    const { _: inputs, ...options } = parse(Deno.args, {
+      string: ["template", "output"],
+    });
 
     let templateString = assets.defaultTemplate;
-    if (typeof options.template === "string") {
+    if (options.template) {
       templateString = Deno.readTextFileSync(options.template);
     }
 
     if (inputs.length === 0) {
       // TODO: output usage to stderr when no inputs are given
       Deno.exit(1);
+    }
+
+    if (options.output && inputs.length > 1) {
+      throw new Error(
+        "Cannot specify --output when generating multiple output files"
+      );
     }
 
     const templateDocument = new DOMParser().parseFromString(
@@ -37,11 +45,15 @@ function main() {
 
       const htmlString = renderHtml(inputString, renderer, templateDocument);
 
+      // TODO: support default content
       const extname = path.extname(filepath);
       const filepathWithHtmlExt =
         filepath.substring(0, filepath.length - extname.length) + ".html";
+      const outputFilepath = options.output
+        ? options.output
+        : filepathWithHtmlExt;
 
-      Deno.writeTextFileSync(filepathWithHtmlExt, htmlString);
+      Deno.writeTextFileSync(outputFilepath, htmlString);
     }
   } catch (e) {
     console.error(e.message);
