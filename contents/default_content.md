@@ -148,9 +148,9 @@ abortBtn.addEventListener("click", () => {
 
 # Image showcase
 
-![Wet glass with a lot of red and white lights behind](https://raw.githubusercontent.com/tai2/decor/main/content/sample-5.jpg "This is an example image")
+![Wet glass with a lot of red and white lights behind](https://raw.githubusercontent.com/tai2/decor/main/contents/sample-5.jpg "This is an example image")
 
-![Scenery with green trees and cars passing through](https://raw.githubusercontent.com/tai2/decor/main/content/sample-5s.mp4 "This is an example video")
+![Scenery with green trees and cars passing through](https://raw.githubusercontent.com/tai2/decor/main/contents/sample-5s.mp4 "This is an example video")
 
 # Headings showcase
 
