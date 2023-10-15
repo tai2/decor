@@ -16,7 +16,7 @@ function runDecor(...args: string[]): Deno.CommandOutput {
   return command.outputSync();
 }
 
-Deno.test("Decor emits output with a filename with `.md` extention", () => {
+Deno.test("decor emits output with a filename with `.md` extention", () => {
   // Create temp directory
   const tempDirPath = Deno.makeTempDirSync({
     prefix: "decor_test_fixture",
