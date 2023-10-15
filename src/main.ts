@@ -1,4 +1,5 @@
 import { parse } from "./deps/std/flags.ts";
+import * as path from "./deps/std/path.ts";
 import { marked } from "./deps/marked.ts";
 import { DOMParser } from "./deps/deno-dom.ts";
 import { extractTemplate } from "./extract_template.ts";
@@ -24,18 +25,23 @@ function main() {
     }
 
     const template = extractTemplate(templateDocument);
-
     const renderer = templateRenderer(template);
 
-    const tokens = marked.lexer(assets.defaultContent);
+    for (const input of inputs) {
+      const filepath = input.toString();
+      const inputString = Deno.readTextFileSync(filepath);
+      const tokens = marked.lexer(inputString);
+      const output = Parser.parse(renderer, tokens);
+      templateDocument.body.innerHTML = output;
+      const htmlString =
+        "<!DOCTYPE html>\n" + templateDocument.documentElement?.outerHTML;
 
-    const output = Parser.parse(renderer, tokens);
+      const extname = path.extname(filepath);
+      const filepathWithHtmlExt =
+        filepath.substring(0, filepath.length - extname.length) + ".html";
 
-    //console.log(inputs, options);
-    templateDocument.body.innerHTML = output;
-    const htmlString =
-      "<!DOCTYPE html>\n" + templateDocument.documentElement?.outerHTML;
-    console.log(htmlString);
+      Deno.writeTextFileSync(filepathWithHtmlExt, htmlString);
+    }
   } catch (e) {
     console.error(e.message);
     Deno.exit(1);
