@@ -6,7 +6,7 @@ import { extractTemplate } from "./extract_template.ts";
 function parseDefaultTemplate(): HTMLDocument {
   const dirname = path.dirname(path.fromFileUrl(import.meta.url));
   const templateString = Deno.readTextFileSync(
-    path.join(dirname, "../content/default_template.html")
+    path.join(dirname, "../contents/default_template.html")
   );
 
   return new DOMParser().parseFromString(templateString, "text/html")!;

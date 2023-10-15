@@ -1,7 +1,7 @@
 const defaultTemplate = await Deno.readTextFile(
-  "./content/default_template.html"
+  "./contents/default_template.html"
 );
-const defaultContent = await Deno.readTextFile("./content/default_content.md");
+const defaultContent = await Deno.readTextFile("./contents/default_content.md");
 
 const assets = {
   defaultTemplate,
