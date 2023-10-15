@@ -1,10 +1,9 @@
 import { parse } from "./deps/std/flags.ts";
 import * as path from "./deps/std/path.ts";
-import { marked } from "./deps/marked.ts";
 import { DOMParser } from "./deps/deno-dom.ts";
 import { extractTemplate } from "./extract_template.ts";
-import { Parser } from "./parser.ts";
 import { templateRenderer } from "./template_renderer.ts";
+import { renderHtml } from "./render_html.ts";
 import assets from "./assets.json" assert { type: "json" };
 
 function main() {
@@ -35,11 +34,8 @@ function main() {
     for (const input of inputs) {
       const filepath = input.toString();
       const inputString = Deno.readTextFileSync(filepath);
-      const tokens = marked.lexer(inputString);
-      const output = Parser.parse(renderer, tokens);
-      templateDocument.body.innerHTML = output;
-      const htmlString =
-        "<!DOCTYPE html>\n" + templateDocument.documentElement?.outerHTML;
+
+      const htmlString = renderHtml(inputString, renderer, templateDocument);
 
       const extname = path.extname(filepath);
       const filepathWithHtmlExt =
