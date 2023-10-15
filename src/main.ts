@@ -10,7 +10,6 @@ function main() {
   try {
     const { _: inputs, ...options } = parse(Deno.args);
 
-    // TODO: Add a test case for missing template file
     let templateString = assets.defaultTemplate;
     if (typeof options.template === "string") {
       templateString = Deno.readTextFileSync(options.template);
@@ -39,6 +38,7 @@ function main() {
     console.log(htmlString);
   } catch (e) {
     console.error(e.message);
+    Deno.exit(1);
   }
 }
 
