@@ -73,3 +73,16 @@ Deno.test(
     Deno.removeSync(tempDirPath, { recursive: true });
   }
 );
+
+Deno.test(
+  "decor emits the default template when --show-defualt-template is specified",
+  () => {
+    // Run decor
+    const { code, stdout } = runDecor("--show-default-template");
+    assertEquals(code, 0);
+    assertStringIncludes(
+      new TextDecoder().decode(stdout),
+      "Decor default template"
+    );
+  }
+);

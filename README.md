@@ -26,8 +26,8 @@ templates are described in the following sections.
   content then emits the output.
 - `--output` Output filename. When omitted, output is emitted to the standard
   output.
-- `--generate-template` Emit the default template. You can use it as a starting
-  point of your own template.
+- `--show-default-template` Emit the default template. You can use it as a
+  starting point of your own template.
 
 # Template Structure
 

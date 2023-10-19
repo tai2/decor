@@ -5,42 +5,51 @@ import { templateRenderer } from "./template_renderer.ts";
 import { renderHtml } from "./render_html.ts";
 import assets from "./assets.json" assert { type: "json" };
 
+function render(contentString: string, templateString: string): string {
+  const templateDocument = new DOMParser().parseFromString(
+    templateString,
+    "text/html"
+  );
+  if (!templateDocument) {
+    throw new Error("Failed to parse template");
+  }
+
+  const template = extractTemplate(templateDocument);
+  const renderer = templateRenderer(template);
+
+  return renderHtml(contentString, renderer, templateDocument);
+}
+
 async function main() {
   try {
     const {
       _: [input],
       ...options
     } = parse(Deno.args, {
-      string: ["template", "output", "help"],
+      string: ["help", "template", "output", "show-generate-template"],
     });
-
-    let templateString = assets.defaultTemplate;
-    if (options.template) {
-      templateString = Deno.readTextFileSync(options.template);
-    }
 
     if (options.help) {
       // TODO: output usage to stdout
       Deno.exit(1);
     }
 
-    const templateDocument = new DOMParser().parseFromString(
-      templateString,
-      "text/html"
-    );
-    if (!templateDocument) {
-      throw new Error("Failed to parse template");
+    let outputString;
+    if (options["show-generate-output"]) {
+      outputString = assets.defaultTemplate;
+    } else {
+      let templateString = assets.defaultTemplate;
+      if (options.template) {
+        templateString = Deno.readTextFileSync(options.template);
+      }
+
+      let contentString = assets.defaultContent;
+      if (input !== undefined) {
+        contentString = Deno.readTextFileSync(input.toString());
+      }
+
+      outputString = render(contentString, templateString);
     }
-
-    const template = extractTemplate(templateDocument);
-    const renderer = templateRenderer(template);
-
-    let inputString = assets.defaultContent;
-    if (input !== undefined) {
-      inputString = Deno.readTextFileSync(input.toString());
-    }
-
-    const htmlString = renderHtml(inputString, renderer, templateDocument);
 
     let writableStream = Deno.stdout.writable;
     if (options.output) {
@@ -50,7 +59,7 @@ async function main() {
 
     await writableStream
       .getWriter()
-      .write(new TextEncoder().encode(htmlString));
+      .write(new TextEncoder().encode(outputString));
   } catch (e) {
     console.error(e.message);
     Deno.exit(1);
