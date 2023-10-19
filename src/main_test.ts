@@ -16,28 +16,21 @@ function runDecor(...args: string[]): Deno.CommandOutput {
   return command.outputSync();
 }
 
-Deno.test("decor emits output with a filename with `.md` extention", () => {
-  // Create temp directory
-  const tempDirPath = Deno.makeTempDirSync({
-    prefix: "decor_test_fixture",
-  });
-
+Deno.test("decor emits output to the standard output", () => {
   // Copy default content to temp directory
   const dirname = path.dirname(path.fromFileUrl(import.meta.url));
   const defaultContentPath = path.join(
     dirname,
     "../contents/default_content.md"
   );
-  const tempContentPath = path.join(tempDirPath, "test.md");
-  Deno.copyFileSync(defaultContentPath, tempContentPath);
 
   // Run decor
-  const { code } = runDecor(tempContentPath);
+  const { code, stdout } = runDecor(defaultContentPath);
   assertEquals(code, 0);
-  assert(fs.existsSync(path.join(tempDirPath, "test.html")));
-
-  // Clean up temp directory
-  Deno.removeSync(tempDirPath, { recursive: true });
+  assertStringIncludes(
+    new TextDecoder().decode(stdout),
+    "Inline elements showcase"
+  );
 });
 
 Deno.test("When no template file exists, decor raises an error", () => {
@@ -69,17 +62,5 @@ Deno.test(
 
     // Clean up temp directory
     Deno.removeSync(tempDirPath, { recursive: true });
-  }
-);
-
-Deno.test(
-  "When --output is specified with multiple inputs, decor raises an error",
-  () => {
-    const { code, stderr } = runDecor("a.md", "b.md", "--output", "ouput.html");
-    assertEquals(code, 1);
-    assertStringIncludes(
-      new TextDecoder().decode(stderr),
-      "Cannot specify --output when generating multiple output files"
-    );
   }
 );

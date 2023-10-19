@@ -6,9 +6,12 @@ import { templateRenderer } from "./template_renderer.ts";
 import { renderHtml } from "./render_html.ts";
 import assets from "./assets.json" assert { type: "json" };
 
-function main() {
+async function main() {
   try {
-    const { _: inputs, ...options } = parse(Deno.args, {
+    const {
+      _: [input],
+      ...options
+    } = parse(Deno.args, {
       string: ["template", "output"],
     });
 
@@ -17,15 +20,9 @@ function main() {
       templateString = Deno.readTextFileSync(options.template);
     }
 
-    if (inputs.length === 0) {
+    if (!input) {
       // TODO: output usage to stderr when no inputs are given
       Deno.exit(1);
-    }
-
-    if (options.output && inputs.length > 1) {
-      throw new Error(
-        "Cannot specify --output when generating multiple output files"
-      );
     }
 
     const templateDocument = new DOMParser().parseFromString(
@@ -39,26 +36,25 @@ function main() {
     const template = extractTemplate(templateDocument);
     const renderer = templateRenderer(template);
 
-    for (const input of inputs) {
-      const filepath = input.toString();
-      const inputString = Deno.readTextFileSync(filepath);
+    const filepath = input.toString();
+    const inputString = Deno.readTextFileSync(filepath);
 
-      const htmlString = renderHtml(inputString, renderer, templateDocument);
+    const htmlString = renderHtml(inputString, renderer, templateDocument);
 
-      // TODO: support default content
-      const extname = path.extname(filepath);
-      const filepathWithHtmlExt =
-        filepath.substring(0, filepath.length - extname.length) + ".html";
-      const outputFilepath = options.output
-        ? options.output
-        : filepathWithHtmlExt;
-
-      Deno.writeTextFileSync(outputFilepath, htmlString);
+    // TODO: support default content
+    let writableStream = Deno.stdout.writable;
+    if (options.output) {
+      const file = Deno.openSync(options.output, { write: true, create: true });
+      writableStream = file.writable;
     }
+
+    await writableStream
+      .getWriter()
+      .write(new TextEncoder().encode(htmlString));
   } catch (e) {
     console.error(e.message);
     Deno.exit(1);
   }
 }
 
-main();
+await main();
