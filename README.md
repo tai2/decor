@@ -21,6 +21,7 @@ templates are described in the following sections.
 
 # Options
 
+- `--help` Show help.
 - `--template` Template file. If omitted, the default template is used.
 - `--watch` Run `decor` in watch mode. It detects updates for the template and
   content then emits the output.
