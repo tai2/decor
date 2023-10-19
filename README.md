@@ -10,24 +10,24 @@ TBD
 
 # How to Use
 
-`decor` takes a template file and one or more Markdown files as arguments.
+`decor` takes a pair of template and Markdown files as arguments.
 
 ```bash
 decor --template template.html content.md
 ```
 
-Then it generates `content.html`. The rules for templates are described in the
-following sections.
+Then it generates a rendered HTML to the standard output. The rules for
+templates are described in the following sections.
 
 # Options
 
 - `--template` Template file. If omitted, the default template is used.
-- `--watch` Run `decor` in watch mode. It detects updates for template and
-  contents then emits outputs.
-- `--output` Output filename. When omitted, the input file name with the
-  extension part replaced with `.md` is used.
-- `--generate-template` Emit the default template to a file. You can use it as a
-  starting point of your own template.
+- `--watch` Run `decor` in watch mode. It detects updates for the template and
+  content then emits the output.
+- `--output` Output filename. When omitted, output is emitted to the standard
+  output.
+- `--generate-template` Emit the default template. You can use it as a starting
+  point of your own template.
 
 # Template Structure
 
@@ -199,7 +199,7 @@ element. The content of the element is replaced with the parameter.
 
 If these attributes are not specified, `decor` suposes the default mappings are
 applied to the root element. It depends on element type. For example, the
-default mappings of the `paragraph` and `image` elements look like these.
+default mappings of the `paragraph`and `image` elements look like these.
 
 ```html
 <p data-decor-content="content"></p>
@@ -215,10 +215,10 @@ default mappings of the `paragraph` and `image` elements look like these.
 
 # Reviewing Template
 
-Since template is just a plain HTML, you can write and review it as you want.
-When contents are omitted, the default content included in `decor` is used. It's
-useful when you want to review your stylesheets but you don't need to define the
-whole element definitions in your template.
+Since template is just a plain HTML, you can write and review it whatever ways
+you want. When input content is omitted, the default content included in `decor`
+is used. It's useful when you want to review your stylesheets during template
+development.
 
 # Reference
 
