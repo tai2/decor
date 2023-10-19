@@ -29,7 +29,10 @@ async function main() {
       string: ["help", "template", "output", "show-generate-template"],
     });
 
-    if (options.help) {
+    if (
+      options.help ||
+      (input === undefined && options.template === undefined)
+    ) {
       // TODO: output usage to stdout
       Deno.exit(1);
     }
