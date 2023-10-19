@@ -23,7 +23,6 @@ Deno.test("decor emits output to the standard output", () => {
     "../contents/default_content.md"
   );
 
-  // Run decor
   const { code, stdout } = runDecor(defaultContentPath);
   assertEquals(code, 0);
   assertStringIncludes(
@@ -33,7 +32,6 @@ Deno.test("decor emits output to the standard output", () => {
 });
 
 Deno.test("decor uses the default content when input is ommited", () => {
-  // Run decor
   const { code, stdout } = runDecor();
   assertEquals(code, 0);
   assertStringIncludes(
@@ -77,7 +75,6 @@ Deno.test(
 Deno.test(
   "decor emits the default template when --show-defualt-template is specified",
   () => {
-    // Run decor
     const { code, stdout } = runDecor("--show-default-template");
     assertEquals(code, 0);
     assertStringIncludes(
