@@ -1,6 +1,6 @@
 # What's decor?
 
-`decor` is a Markdown transformer which takes Markdown files as contents and a
+`decor` is a Markdown transformer which takes a Markdown file as content and a
 standalone HTML file as a template. It is designed for rather oneshot single
 page use than fullset static site generation.
 
@@ -217,8 +217,8 @@ default mappings of the `paragraph`and `image` elements look like these.
 # Reviewing Template
 
 Since template is just a plain HTML, you can write and review it whatever ways
-you want. When input content is omitted, the default content included in `decor`
-is used. It's useful when you want to review your stylesheets during template
+you want. When input is omitted, the default content included in `decor` is
+used. It's useful when you want to review your stylesheets during template
 development.
 
 # Reference
