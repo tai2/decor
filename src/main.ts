@@ -1,5 +1,4 @@
 import { parse } from "./deps/std/flags.ts";
-import * as path from "./deps/std/path.ts";
 import { DOMParser } from "./deps/deno-dom.ts";
 import { extractTemplate } from "./extract_template.ts";
 import { templateRenderer } from "./template_renderer.ts";
@@ -12,7 +11,7 @@ async function main() {
       _: [input],
       ...options
     } = parse(Deno.args, {
-      string: ["template", "output"],
+      string: ["template", "output", "help"],
     });
 
     let templateString = assets.defaultTemplate;
@@ -20,8 +19,8 @@ async function main() {
       templateString = Deno.readTextFileSync(options.template);
     }
 
-    if (!input) {
-      // TODO: output usage to stderr when no inputs are given
+    if (options.help) {
+      // TODO: output usage to stdout
       Deno.exit(1);
     }
 
@@ -36,12 +35,13 @@ async function main() {
     const template = extractTemplate(templateDocument);
     const renderer = templateRenderer(template);
 
-    const filepath = input.toString();
-    const inputString = Deno.readTextFileSync(filepath);
+    let inputString = assets.defaultContent;
+    if (input !== undefined) {
+      inputString = Deno.readTextFileSync(input.toString());
+    }
 
     const htmlString = renderHtml(inputString, renderer, templateDocument);
 
-    // TODO: support default content
     let writableStream = Deno.stdout.writable;
     if (options.output) {
       const file = Deno.openSync(options.output, { write: true, create: true });

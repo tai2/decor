@@ -17,7 +17,6 @@ function runDecor(...args: string[]): Deno.CommandOutput {
 }
 
 Deno.test("decor emits output to the standard output", () => {
-  // Copy default content to temp directory
   const dirname = path.dirname(path.fromFileUrl(import.meta.url));
   const defaultContentPath = path.join(
     dirname,
@@ -26,6 +25,16 @@ Deno.test("decor emits output to the standard output", () => {
 
   // Run decor
   const { code, stdout } = runDecor(defaultContentPath);
+  assertEquals(code, 0);
+  assertStringIncludes(
+    new TextDecoder().decode(stdout),
+    "Inline elements showcase"
+  );
+});
+
+Deno.test("decor uses the default content when input is ommited", () => {
+  // Run decor
+  const { code, stdout } = runDecor();
   assertEquals(code, 0);
   assertStringIncludes(
     new TextDecoder().decode(stdout),
