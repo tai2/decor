@@ -1,0 +1,7 @@
+Usage : decor [options] [--template template.html] [content_file]
+    Generate a rendered HTML and output it
+    --help : Show help.
+    --template : Template file. If omitted, the default template is used.
+    --watch : Run decor in watch mode. It detects updates for the template and content then emits the output.
+    --output : Output filename. When omitted, output is emitted to the standard output.
+    --show-default-template : Emit the default template. You can use it as a starting point of your own template.

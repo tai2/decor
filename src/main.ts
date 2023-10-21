@@ -26,19 +26,21 @@ async function main() {
       _: [input],
       ...options
     } = parse(Deno.args, {
-      string: ["help", "template", "output", "show-generate-template"],
+      string: ["help", "template", "output", "show-default-template"],
     });
 
     if (
       options.help ||
-      (input === undefined && options.template === undefined)
+      (input === undefined &&
+        options.template === undefined &&
+        options["show-default-template"] === undefined)
     ) {
-      // TODO: output usage to stdout
+      console.log(assets.helpText);
       Deno.exit(1);
     }
 
     let outputString;
-    if (options["show-generate-output"]) {
+    if (options["show-default-template"]) {
       outputString = assets.defaultTemplate;
     } else {
       let templateString = assets.defaultTemplate;

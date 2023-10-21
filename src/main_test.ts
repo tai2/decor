@@ -31,14 +31,23 @@ Deno.test("decor emits output to the standard output", () => {
   );
 });
 
-Deno.test("decor uses the default content when input is ommited", () => {
-  const { code, stdout } = runDecor();
-  assertEquals(code, 0);
-  assertStringIncludes(
-    new TextDecoder().decode(stdout),
-    "Inline elements showcase"
-  );
-});
+Deno.test(
+  "decor uses the default content when input is ommited but template is specified",
+  () => {
+    const dirname = path.dirname(path.fromFileUrl(import.meta.url));
+    const defaultContentPath = path.join(
+      dirname,
+      "../contents/default_content.md"
+    );
+
+    const { code, stdout } = runDecor(defaultContentPath);
+    assertEquals(code, 0);
+    assertStringIncludes(
+      new TextDecoder().decode(stdout),
+      "Inline elements showcase"
+    );
+  }
+);
 
 Deno.test("When no template file exists, decor raises an error", () => {
   const { code, stderr } = runDecor("--template", "nonexistent.html");
@@ -81,5 +90,20 @@ Deno.test(
       new TextDecoder().decode(stdout),
       "Decor default template"
     );
+  }
+);
+
+Deno.test("decor shows help text when --help is specified", () => {
+  const { code, stdout } = runDecor("--help");
+  assertEquals(code, 1);
+  assertStringIncludes(new TextDecoder().decode(stdout), "Usage : decor");
+});
+
+Deno.test(
+  "decor shows help text when neither content nor template is specified",
+  () => {
+    const { code, stdout } = runDecor("--help");
+    assertEquals(code, 1);
+    assertStringIncludes(new TextDecoder().decode(stdout), "Usage : decor");
   }
 );
