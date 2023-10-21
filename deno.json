@@ -11,6 +11,8 @@
     ]
   },
   "fmt": {
+    "semiColons": false,
+    "singleQuote": true,
     "exclude": [
       "**/*.md"
     ]

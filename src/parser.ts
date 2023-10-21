@@ -1,267 +1,267 @@
-import { Renderer } from "./renderer.ts";
-import { _TextRenderer, unescape } from "./deps/marked.ts";
-import type { Token, Tokens } from "./deps/marked.ts";
+import { Renderer } from './renderer.ts'
+import { _TextRenderer, unescape } from './deps/marked.ts'
+import type { Token, Tokens } from './deps/marked.ts'
 
 /**
  * Parsing & Compiling
  */
 export class Parser {
-  renderer: Renderer;
-  textRenderer: _TextRenderer;
+  renderer: Renderer
+  textRenderer: _TextRenderer
   constructor(renderer: Renderer) {
-    this.renderer = renderer;
-    this.textRenderer = new _TextRenderer();
+    this.renderer = renderer
+    this.textRenderer = new _TextRenderer()
   }
 
   /**
    * Static Parse Method
    */
   static parse(renderer: Renderer, tokens: Token[]) {
-    const parser = new Parser(renderer);
-    return parser.parse(tokens);
+    const parser = new Parser(renderer)
+    return parser.parse(tokens)
   }
 
   /**
    * Static Parse Inline Method
    */
   static parseInline(renderer: Renderer, tokens: Token[]) {
-    const parser = new Parser(renderer);
-    return parser.parseInline(tokens);
+    const parser = new Parser(renderer)
+    return parser.parseInline(tokens)
   }
 
   /**
    * Parse Loop
    */
   parse(tokens: Token[], top = true): string {
-    let out = "";
+    let out = ''
 
     for (let i = 0; i < tokens.length; i++) {
-      const token = tokens[i];
+      const token = tokens[i]
 
       switch (token.type) {
-        case "space": {
-          continue;
+        case 'space': {
+          continue
         }
-        case "hr": {
-          out += this.renderer.hr();
-          continue;
+        case 'hr': {
+          out += this.renderer.hr()
+          continue
         }
-        case "heading": {
-          const headingToken = token as Tokens.Heading;
+        case 'heading': {
+          const headingToken = token as Tokens.Heading
           out += this.renderer.heading(
             this.parseInline(headingToken.tokens),
             headingToken.depth,
             unescape(this.parseInline(headingToken.tokens, this.textRenderer)),
-          );
-          continue;
+          )
+          continue
         }
-        case "code": {
-          const codeToken = token as Tokens.Code;
+        case 'code': {
+          const codeToken = token as Tokens.Code
           out += this.renderer.code(
             codeToken.text,
             codeToken.lang,
             !!codeToken.escaped,
-          );
-          continue;
+          )
+          continue
         }
-        case "table": {
-          const tableToken = token as Tokens.Table;
-          let header = "";
+        case 'table': {
+          const tableToken = token as Tokens.Table
+          let header = ''
 
           // header
-          let cell = "";
+          let cell = ''
           for (let j = 0; j < tableToken.header.length; j++) {
             cell += this.renderer.tablecell(
               this.parseInline(tableToken.header[j].tokens),
               { header: true, align: tableToken.align[j] },
-            );
+            )
           }
-          header += this.renderer.tablerow(cell, { header: true });
+          header += this.renderer.tablerow(cell, { header: true })
 
-          let body = "";
+          let body = ''
           for (let j = 0; j < tableToken.rows.length; j++) {
-            const row = tableToken.rows[j];
+            const row = tableToken.rows[j]
 
-            cell = "";
+            cell = ''
             for (let k = 0; k < row.length; k++) {
               cell += this.renderer.tablecell(this.parseInline(row[k].tokens), {
                 header: false,
                 align: tableToken.align[k],
-              });
+              })
             }
 
-            body += this.renderer.tablerow(cell, { header: false });
+            body += this.renderer.tablerow(cell, { header: false })
           }
-          out += this.renderer.table(header, body);
-          continue;
+          out += this.renderer.table(header, body)
+          continue
         }
-        case "blockquote": {
-          const blockquoteToken = token as Tokens.Blockquote;
-          const body = this.parse(blockquoteToken.tokens);
-          out += this.renderer.blockquote(body);
-          continue;
+        case 'blockquote': {
+          const blockquoteToken = token as Tokens.Blockquote
+          const body = this.parse(blockquoteToken.tokens)
+          out += this.renderer.blockquote(body)
+          continue
         }
-        case "list": {
-          const listToken = token as Tokens.List;
-          const ordered = listToken.ordered;
-          const start = listToken.start;
-          const loose = listToken.loose;
+        case 'list': {
+          const listToken = token as Tokens.List
+          const ordered = listToken.ordered
+          const start = listToken.start
+          const loose = listToken.loose
 
-          let body = "";
+          let body = ''
           for (let j = 0; j < listToken.items.length; j++) {
-            const item = listToken.items[j];
-            const checked = item.checked;
-            const task = item.task;
+            const item = listToken.items[j]
+            const checked = item.checked
+            const task = item.task
 
-            let itemBody = "";
+            let itemBody = ''
             if (item.task) {
-              const checkbox = this.renderer.checkbox(!!checked);
+              const checkbox = this.renderer.checkbox(!!checked)
               if (loose) {
                 if (
                   item.tokens.length > 0 &&
-                  item.tokens[0].type === "paragraph"
+                  item.tokens[0].type === 'paragraph'
                 ) {
-                  item.tokens[0].text = checkbox + " " + item.tokens[0].text;
+                  item.tokens[0].text = checkbox + ' ' + item.tokens[0].text
                   if (
                     item.tokens[0].tokens &&
                     item.tokens[0].tokens.length > 0 &&
-                    item.tokens[0].tokens[0].type === "text"
+                    item.tokens[0].tokens[0].type === 'text'
                   ) {
-                    item.tokens[0].tokens[0].text = checkbox + " " +
-                      item.tokens[0].tokens[0].text;
+                    item.tokens[0].tokens[0].text = checkbox + ' ' +
+                      item.tokens[0].tokens[0].text
                   }
                 } else {
                   item.tokens.unshift({
-                    type: "text",
-                    text: checkbox + " ",
-                  } as Tokens.Text);
+                    type: 'text',
+                    text: checkbox + ' ',
+                  } as Tokens.Text)
                 }
               } else {
-                itemBody += checkbox + " ";
+                itemBody += checkbox + ' '
               }
             }
 
-            itemBody += this.parse(item.tokens, loose);
-            body += this.renderer.listitem(itemBody, ordered, task, !!checked);
+            itemBody += this.parse(item.tokens, loose)
+            body += this.renderer.listitem(itemBody, ordered, task, !!checked)
           }
 
-          out += this.renderer.list(body, ordered, start);
-          continue;
+          out += this.renderer.list(body, ordered, start)
+          continue
         }
-        case "html": {
-          const htmlToken = token as Tokens.HTML;
-          out += this.renderer.html(htmlToken.text, htmlToken.block);
-          continue;
+        case 'html': {
+          const htmlToken = token as Tokens.HTML
+          out += this.renderer.html(htmlToken.text, htmlToken.block)
+          continue
         }
-        case "paragraph": {
-          const paragraphToken = token as Tokens.Paragraph;
+        case 'paragraph': {
+          const paragraphToken = token as Tokens.Paragraph
           out += this.renderer.paragraph(
             this.parseInline(paragraphToken.tokens),
-          );
-          continue;
+          )
+          continue
         }
-        case "text": {
-          let textToken = token as Tokens.Text;
+        case 'text': {
+          let textToken = token as Tokens.Text
           let body = textToken.tokens
             ? this.parseInline(textToken.tokens)
-            : textToken.text;
-          while (i + 1 < tokens.length && tokens[i + 1].type === "text") {
-            textToken = tokens[++i] as Tokens.Text;
-            body += "\n" +
+            : textToken.text
+          while (i + 1 < tokens.length && tokens[i + 1].type === 'text') {
+            textToken = tokens[++i] as Tokens.Text
+            body += '\n' +
               (textToken.tokens
                 ? this.parseInline(textToken.tokens)
-                : textToken.text);
+                : textToken.text)
           }
-          out += top ? this.renderer.paragraph(body) : body;
-          continue;
+          out += top ? this.renderer.paragraph(body) : body
+          continue
         }
 
         default: {
-          const errMsg = 'Token with "' + token.type + '" type was not found.';
-          throw new Error(errMsg);
+          const errMsg = 'Token with "' + token.type + '" type was not found.'
+          throw new Error(errMsg)
         }
       }
     }
 
-    return out;
+    return out
   }
 
   /**
    * Parse Inline Tokens
    */
   parseInline(tokens: Token[], renderer?: Renderer | _TextRenderer): string {
-    renderer = renderer || this.renderer;
-    let out = "";
+    renderer = renderer || this.renderer
+    let out = ''
 
     for (let i = 0; i < tokens.length; i++) {
-      const token = tokens[i];
+      const token = tokens[i]
 
       switch (token.type) {
-        case "escape": {
-          const escapeToken = token as Tokens.Escape;
-          out += renderer.text(escapeToken.text);
-          break;
+        case 'escape': {
+          const escapeToken = token as Tokens.Escape
+          out += renderer.text(escapeToken.text)
+          break
         }
-        case "html": {
-          const tagToken = token as Tokens.Tag;
-          out += renderer.html(tagToken.text);
-          break;
+        case 'html': {
+          const tagToken = token as Tokens.Tag
+          out += renderer.html(tagToken.text)
+          break
         }
-        case "link": {
-          const linkToken = token as Tokens.Link;
+        case 'link': {
+          const linkToken = token as Tokens.Link
           out += renderer.link(
             linkToken.href,
             linkToken.title,
             this.parseInline(linkToken.tokens, renderer),
-          );
-          break;
+          )
+          break
         }
-        case "image": {
-          const imageToken = token as Tokens.Image;
+        case 'image': {
+          const imageToken = token as Tokens.Image
           out += renderer.image(
             imageToken.href,
             imageToken.title,
             imageToken.text,
-          );
-          break;
+          )
+          break
         }
-        case "strong": {
-          const strongToken = token as Tokens.Strong;
+        case 'strong': {
+          const strongToken = token as Tokens.Strong
           out += renderer.strong(
             this.parseInline(strongToken.tokens, renderer),
-          );
-          break;
+          )
+          break
         }
-        case "em": {
-          const emToken = token as Tokens.Em;
-          out += renderer.em(this.parseInline(emToken.tokens, renderer));
-          break;
+        case 'em': {
+          const emToken = token as Tokens.Em
+          out += renderer.em(this.parseInline(emToken.tokens, renderer))
+          break
         }
-        case "codespan": {
-          const codespanToken = token as Tokens.Codespan;
-          out += renderer.codespan(codespanToken.text);
-          break;
+        case 'codespan': {
+          const codespanToken = token as Tokens.Codespan
+          out += renderer.codespan(codespanToken.text)
+          break
         }
-        case "br": {
-          out += renderer.br();
-          break;
+        case 'br': {
+          out += renderer.br()
+          break
         }
-        case "del": {
-          const delToken = token as Tokens.Del;
-          out += renderer.del(this.parseInline(delToken.tokens, renderer));
-          break;
+        case 'del': {
+          const delToken = token as Tokens.Del
+          out += renderer.del(this.parseInline(delToken.tokens, renderer))
+          break
         }
-        case "text": {
-          const textToken = token as Tokens.Text;
-          out += renderer.text(textToken.text);
-          break;
+        case 'text': {
+          const textToken = token as Tokens.Text
+          out += renderer.text(textToken.text)
+          break
         }
         default: {
-          const errMsg = 'Token with "' + token.type + '" type was not found.';
-          throw new Error(errMsg);
+          const errMsg = 'Token with "' + token.type + '" type was not found.'
+          throw new Error(errMsg)
         }
       }
     }
-    return out;
+    return out
   }
 }
