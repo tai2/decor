@@ -51,7 +51,7 @@ export class Parser {
           out += this.renderer.heading(
             this.parseInline(headingToken.tokens),
             headingToken.depth,
-            unescape(this.parseInline(headingToken.tokens, this.textRenderer))
+            unescape(this.parseInline(headingToken.tokens, this.textRenderer)),
           );
           continue;
         }
@@ -60,7 +60,7 @@ export class Parser {
           out += this.renderer.code(
             codeToken.text,
             codeToken.lang,
-            !!codeToken.escaped
+            !!codeToken.escaped,
           );
           continue;
         }
@@ -73,7 +73,7 @@ export class Parser {
           for (let j = 0; j < tableToken.header.length; j++) {
             cell += this.renderer.tablecell(
               this.parseInline(tableToken.header[j].tokens),
-              { header: true, align: tableToken.align[j] }
+              { header: true, align: tableToken.align[j] },
             );
           }
           header += this.renderer.tablerow(cell, { header: true });
@@ -127,8 +127,8 @@ export class Parser {
                     item.tokens[0].tokens.length > 0 &&
                     item.tokens[0].tokens[0].type === "text"
                   ) {
-                    item.tokens[0].tokens[0].text =
-                      checkbox + " " + item.tokens[0].tokens[0].text;
+                    item.tokens[0].tokens[0].text = checkbox + " " +
+                      item.tokens[0].tokens[0].text;
                   }
                 } else {
                   item.tokens.unshift({
@@ -156,7 +156,7 @@ export class Parser {
         case "paragraph": {
           const paragraphToken = token as Tokens.Paragraph;
           out += this.renderer.paragraph(
-            this.parseInline(paragraphToken.tokens)
+            this.parseInline(paragraphToken.tokens),
           );
           continue;
         }
@@ -167,8 +167,7 @@ export class Parser {
             : textToken.text;
           while (i + 1 < tokens.length && tokens[i + 1].type === "text") {
             textToken = tokens[++i] as Tokens.Text;
-            body +=
-              "\n" +
+            body += "\n" +
               (textToken.tokens
                 ? this.parseInline(textToken.tokens)
                 : textToken.text);
@@ -213,7 +212,7 @@ export class Parser {
           out += renderer.link(
             linkToken.href,
             linkToken.title,
-            this.parseInline(linkToken.tokens, renderer)
+            this.parseInline(linkToken.tokens, renderer),
           );
           break;
         }
@@ -222,14 +221,14 @@ export class Parser {
           out += renderer.image(
             imageToken.href,
             imageToken.title,
-            imageToken.text
+            imageToken.text,
           );
           break;
         }
         case "strong": {
           const strongToken = token as Tokens.Strong;
           out += renderer.strong(
-            this.parseInline(strongToken.tokens, renderer)
+            this.parseInline(strongToken.tokens, renderer),
           );
           break;
         }

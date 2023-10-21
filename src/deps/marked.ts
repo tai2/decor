@@ -1,8 +1,8 @@
 export { marked } from "https://raw.githubusercontent.com/markedjs/marked/v9.0.0/src/marked.ts";
 export {
+  cleanUrl,
   escape,
   unescape,
-  cleanUrl,
 } from "https://raw.githubusercontent.com/markedjs/marked/v9.0.0/src/helpers.ts";
 export type {
   Token,

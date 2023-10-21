@@ -12,7 +12,7 @@ export type Renderer = {
     text: string,
     ordered: boolean,
     task: boolean,
-    checked: boolean
+    checked: boolean,
   ): string;
   checkbox(checked: boolean): string;
   paragraph(text: string): string;
@@ -23,7 +23,7 @@ export type Renderer = {
     flags: {
       header: boolean;
       align: "center" | "left" | "right" | null;
-    }
+    },
   ): string;
 
   /**

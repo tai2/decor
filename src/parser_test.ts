@@ -36,13 +36,13 @@ Deno.test(
 
     Parser.parse(
       renderer,
-      marked.lexer("```js\nconsole.log('Hello, World!');\n```")
+      marked.lexer("```js\nconsole.log('Hello, World!');\n```"),
     );
 
     assertSpyCall(codeSpy, 0, {
       args: ["console.log('Hello, World!');", "js", false],
     });
-  }
+  },
 );
 
 Deno.test("`blockqote` callback receives arguments (quote)", () => {
@@ -111,7 +111,7 @@ Deno.test(
     assertSpyCall(listitemSpy, 0, {
       args: ["Hello, World!", false, false, false],
     });
-  }
+  },
 );
 
 Deno.test("`checkebox` callback receives arguments (checked)", () => {
@@ -238,7 +238,7 @@ Deno.test("`link` callback receives arguments (href, title, text)", () => {
 
   Parser.parse(
     renderer,
-    marked.lexer('[Hello, World!](https://example.com "title")')
+    marked.lexer('[Hello, World!](https://example.com "title")'),
   );
 
   assertSpyCall(linkSpy, 0, {
@@ -252,7 +252,7 @@ Deno.test("`image` callback receives arguments (href, title, text)", () => {
 
   Parser.parse(
     renderer,
-    marked.lexer('![Hello, World!](https://example.com/image.jpg "title")')
+    marked.lexer('![Hello, World!](https://example.com/image.jpg "title")'),
   );
 
   assertSpyCall(imageSpy, 0, {

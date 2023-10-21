@@ -8,7 +8,7 @@ import assets from "./assets.json" assert { type: "json" };
 function render(contentString: string, templateString: string): string {
   const templateDocument = new DOMParser().parseFromString(
     templateString,
-    "text/html"
+    "text/html",
   );
   if (!templateDocument) {
     throw new Error("Failed to parse template");

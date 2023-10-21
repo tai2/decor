@@ -1,7 +1,7 @@
 import { extname } from "./deps/std/url.ts";
 import { contentType } from "./deps/std/media_types.ts";
 import { Element } from "./deps/deno-dom.ts";
-import { escape, cleanUrl } from "./deps/marked.ts";
+import { cleanUrl, escape } from "./deps/marked.ts";
 import { Template } from "./template.ts";
 import { Renderer } from "./renderer.ts";
 
@@ -23,7 +23,7 @@ export function getAttributeKeys(template: Element): string[] {
   getAttributeKeysInner(template, attributeKeys);
 
   return attributeKeys.filter(
-    (value, index, array) => array.indexOf(value) === index
+    (value, index, array) => array.indexOf(value) === index,
   );
 }
 
@@ -33,12 +33,12 @@ type Parameters = Record<
     value: string | undefined;
     destination:
       | {
-          type: "content";
-        }
+        type: "content";
+      }
       | {
-          type: "attribute";
-          default: string;
-        };
+        type: "attribute";
+        default: string;
+      };
     isReferenced: boolean;
   }
 >;
@@ -46,10 +46,10 @@ type Parameters = Record<
 function applyParameters(
   template: Element,
   attributeKeys: string[],
-  parameters: Parameters
+  parameters: Parameters,
 ) {
   const contentContainers = Array.from(
-    template.querySelectorAll("[data-decor-content]")
+    template.querySelectorAll("[data-decor-content]"),
   );
   if (template.hasAttribute("data-decor-content")) {
     contentContainers.push(template);
@@ -68,11 +68,11 @@ function applyParameters(
 
   for (const attributeKey of attributeKeys) {
     const destinaionAttribute = attributeKey.substring(
-      "data-decor-attribute-".length
+      "data-decor-attribute-".length,
     );
 
     const attributeContainers = Array.from(
-      template.querySelectorAll(`[${attributeKey}]`)
+      template.querySelectorAll(`[${attributeKey}]`),
     );
     if (template.hasAttribute(attributeKey)) {
       attributeContainers.push(template);
@@ -133,7 +133,7 @@ export function templateRenderer(template: Template): Renderer {
 
   function cloneTemplateThenApplyParameters(
     templateType: keyof Template,
-    parameters: Parameters
+    parameters: Parameters,
   ) {
     const templateElement = template[templateType].cloneNode(true) as Element;
     const attributeKeys = getAttributeKeysFromCache(templateType);
@@ -145,7 +145,7 @@ export function templateRenderer(template: Template): Renderer {
     code: (
       code: string,
       infostring: string | undefined,
-      escaped: boolean
+      escaped: boolean,
     ): string => {
       const infoStringTrimmed = (infostring || "").match(/^\S*/)?.[0];
       code = code.replace(/\n$/, "") + "\n";
@@ -250,13 +250,13 @@ export function templateRenderer(template: Template): Renderer {
       return ordered
         ? cloneTemplateThenApplyParameters("ordered_list", parameters).outerHTML
         : cloneTemplateThenApplyParameters("unordered_list", parameters)
-            .outerHTML;
+          .outerHTML;
     },
     listitem: (
       text: string,
       ordered: boolean,
       _task: boolean,
-      _checked: boolean
+      _checked: boolean,
     ) => {
       const parameters = {
         content: {
@@ -270,9 +270,9 @@ export function templateRenderer(template: Template): Renderer {
 
       return ordered
         ? cloneTemplateThenApplyParameters("ordered_list_item", parameters)
-            .outerHTML
+          .outerHTML
         : cloneTemplateThenApplyParameters("unordered_list_item", parameters)
-            .outerHTML;
+          .outerHTML;
     },
     checkbox: (checked: boolean) => {
       // task list is not supported right now
@@ -332,7 +332,7 @@ export function templateRenderer(template: Template): Renderer {
       flags: {
         header: boolean;
         align: "center" | "left" | "right" | null;
-      }
+      },
     ) => {
       const parameters: Parameters = {
         content: {
@@ -357,9 +357,9 @@ export function templateRenderer(template: Template): Renderer {
 
       return flags.header
         ? cloneTemplateThenApplyParameters("table_header_cell", parameters)
-            .outerHTML
+          .outerHTML
         : cloneTemplateThenApplyParameters("table_row_cell", parameters)
-            .outerHTML;
+          .outerHTML;
     },
     strong: (text: string) => {
       const parameters = {
@@ -481,7 +481,7 @@ export function templateRenderer(template: Template): Renderer {
       } as const;
 
       return cleanHref !== null &&
-        contentType(extname(cleanHref))?.startsWith("video")
+          contentType(extname(cleanHref))?.startsWith("video")
         ? cloneTemplateThenApplyParameters("video", parameters).outerHTML
         : cloneTemplateThenApplyParameters("image", parameters).outerHTML;
     },

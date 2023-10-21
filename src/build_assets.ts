@@ -1,5 +1,5 @@
 const defaultTemplate = await Deno.readTextFile(
-  "./contents/default_template.html"
+  "./contents/default_template.html",
 );
 const defaultContent = await Deno.readTextFile("./contents/default_content.md");
 const helpText = await Deno.readTextFile("./contents/help.txt");

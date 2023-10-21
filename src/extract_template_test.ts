@@ -6,7 +6,7 @@ import { extractTemplate } from "./extract_template.ts";
 function parseDefaultTemplate(): HTMLDocument {
   const dirname = path.dirname(path.fromFileUrl(import.meta.url));
   const templateString = Deno.readTextFileSync(
-    path.join(dirname, "../contents/default_template.html")
+    path.join(dirname, "../contents/default_template.html"),
   );
 
   return new DOMParser().parseFromString(templateString, "text/html")!;
@@ -22,11 +22,11 @@ Deno.test("`createTemplate` reports lacking elements", () => {
 
   // Remove some elements
   const linkElement = templateDocument.querySelector(
-    "[data-decor-element=link]"
+    "[data-decor-element=link]",
   );
   linkElement?.parentElement?.removeChild(linkElement);
   const imageElement = templateDocument.querySelector(
-    "[data-decor-element=image]"
+    "[data-decor-element=image]",
   );
   imageElement?.parentElement?.removeChild(imageElement);
 
@@ -35,6 +35,6 @@ Deno.test("`createTemplate` reports lacking elements", () => {
       extractTemplate(templateDocument);
     },
     Error,
-    "Missing elements in template: link,image"
+    "Missing elements in template: link,image",
   );
 });

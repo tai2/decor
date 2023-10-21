@@ -4,7 +4,7 @@ import { Template } from "./template.ts";
 export function extractTemplate(templateDocument: HTMLDocument): Template {
   const emptyFragment = new DOMParser().parseFromString(
     "<div></div>",
-    "text/html"
+    "text/html",
   )!.body;
 
   const template: Template = {
@@ -40,7 +40,7 @@ export function extractTemplate(templateDocument: HTMLDocument): Template {
   const missingElements: Array<keyof Template> = [];
   for (const key of Object.keys(template) as Array<keyof Template>) {
     const fragment = templateDocument.querySelector(
-      `[data-decor-element=${key}]`
+      `[data-decor-element=${key}]`,
     );
     if (!fragment) {
       missingElements.push(key);

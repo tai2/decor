@@ -10,7 +10,7 @@ Deno.test(
   () => {
     const templateDocument = new DOMParser().parseFromString(
       assets.defaultTemplate,
-      "text/html"
+      "text/html",
     )!;
 
     const template = extractTemplate(templateDocument);
@@ -19,12 +19,12 @@ Deno.test(
     const htmlString = renderHtml(
       assets.defaultContent,
       renderer,
-      templateDocument
+      templateDocument,
     );
 
     const renderedDocument = new DOMParser().parseFromString(
       htmlString,
-      "text/html"
+      "text/html",
     )!;
 
     assertEquals(renderedDocument.title, "Decor default template");
@@ -32,7 +32,7 @@ Deno.test(
     // Make sure that the body is replaced with the rendered content
     assertStringIncludes(
       renderedDocument.body.innerHTML,
-      "Inline elements showcase"
+      "Inline elements showcase",
     );
-  }
+  },
 );

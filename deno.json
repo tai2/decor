@@ -9,5 +9,10 @@
     "include": [
       "src/*_test.ts"
     ]
+  },
+  "fmt": {
+    "exclude": [
+      "**/*.md"
+    ]
   }
 }

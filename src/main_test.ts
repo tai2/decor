@@ -20,14 +20,14 @@ Deno.test("decor emits output to the standard output", () => {
   const dirname = path.dirname(path.fromFileUrl(import.meta.url));
   const defaultContentPath = path.join(
     dirname,
-    "../contents/default_content.md"
+    "../contents/default_content.md",
   );
 
   const { code, stdout } = runDecor(defaultContentPath);
   assertEquals(code, 0);
   assertStringIncludes(
     new TextDecoder().decode(stdout),
-    "Inline elements showcase"
+    "Inline elements showcase",
   );
 });
 
@@ -37,16 +37,16 @@ Deno.test(
     const dirname = path.dirname(path.fromFileUrl(import.meta.url));
     const defaultContentPath = path.join(
       dirname,
-      "../contents/default_content.md"
+      "../contents/default_content.md",
     );
 
     const { code, stdout } = runDecor(defaultContentPath);
     assertEquals(code, 0);
     assertStringIncludes(
       new TextDecoder().decode(stdout),
-      "Inline elements showcase"
+      "Inline elements showcase",
     );
-  }
+  },
 );
 
 Deno.test("When no template file exists, decor raises an error", () => {
@@ -54,7 +54,7 @@ Deno.test("When no template file exists, decor raises an error", () => {
   assertEquals(code, 1);
   assertStringIncludes(
     new TextDecoder().decode(stderr),
-    "No such file or directory"
+    "No such file or directory",
   );
 });
 
@@ -78,7 +78,7 @@ Deno.test(
 
     // Clean up temp directory
     Deno.removeSync(tempDirPath, { recursive: true });
-  }
+  },
 );
 
 Deno.test(
@@ -88,9 +88,9 @@ Deno.test(
     assertEquals(code, 0);
     assertStringIncludes(
       new TextDecoder().decode(stdout),
-      "Decor default template"
+      "Decor default template",
     );
-  }
+  },
 );
 
 Deno.test("decor shows help text when --help is specified", () => {
@@ -105,5 +105,5 @@ Deno.test(
     const { code, stdout } = runDecor("--help");
     assertEquals(code, 1);
     assertStringIncludes(new TextDecoder().decode(stdout), "Usage : decor");
-  }
+  },
 );

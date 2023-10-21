@@ -6,7 +6,7 @@ import { Parser } from "./parser.ts";
 export function renderHtml(
   markdown: string,
   renderer: Renderer,
-  templateDocument: HTMLDocument
+  templateDocument: HTMLDocument,
 ): string {
   const tokens = marked.lexer(markdown);
   const output = Parser.parse(renderer, tokens);
