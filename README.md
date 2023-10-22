@@ -6,9 +6,22 @@ page use than fullset static site generation.
 
 # Installation
 
+If you have deno in your system, you can install `decor` with the following
+command.
+
 ```bash
 deno install --allow-write --allow-read https://deno.land/x/decor/src/decor.ts
 ```
+
+If you are a Homebrew user on macOS, you can install `decor` with the following
+command.
+
+```
+TBD
+```
+
+For other systems, you can download a binary from the
+[releases](https://github.com/tai2/decor/releases).
 
 # How to Use
 
