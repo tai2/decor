@@ -1,0 +1,34 @@
+name: Build
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - uses: denoland/setup-deno@v1
+        with:
+          deno-version: 1.35.2
+      - name: Compile
+        run: |
+          # Linux
+          deno compile --target x86_64-unknown-linux-gnu --allow-write --allow-read src/decor.ts --output
+          zip -r decor-x86_64-unknown-linux-gnu.zip decor
+          # Windows
+          deno compile --target x86_64-pc-windows-msvc --allow-write --allow-read src/decor.ts --output
+          zip -r decor-x86_64-pc-windows-msvc.zip decor.exe
+          # Mac(Intel)
+          deno compile --target x86_64-apple-darwin --allow-write --allow-read src/decor.ts --output
+          zip -r decor-x86_64-apple-darwin.zip decor
+          # Mac(Apple Silicon)
+          deno compile --target aarch64-apple-darwin --allow-write --allow-read src/decor.ts --output
+          zip -r decor-aarch64-apple-darwin.zip decor
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: decor-*.zip
