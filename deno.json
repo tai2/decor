@@ -14,7 +14,8 @@
     "semiColons": false,
     "singleQuote": true,
     "exclude": [
-      "**/*.md"
+      "**/*.md",
+      "src/assets.json"
     ]
   }
 }
