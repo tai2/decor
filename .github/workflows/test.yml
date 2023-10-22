@@ -25,5 +25,9 @@ jobs:
         run: deno fmt --check
       - name: Lint
         run: deno lint
+      - name: Asset Check
+        run: |
+          deno task build_assets
+          git diff --exit-code src/assets.json
       - name: Test
         run: deno task test
