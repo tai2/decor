@@ -6,7 +6,9 @@ page use than fullset static site generation.
 
 # Installation
 
-TBD
+```bash
+deno install --allow-write --allow-read https://deno.land/x/decor/src/decor.ts
+```
 
 # How to Use
 
