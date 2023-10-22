@@ -8,7 +8,7 @@ import * as fs from './deps/std/fs.ts'
 
 function runDecor(...args: string[]): Deno.CommandOutput {
   const dirname = path.dirname(path.fromFileUrl(import.meta.url))
-  const mainFilePath = path.join(dirname, 'main.ts')
+  const mainFilePath = path.join(dirname, 'decor.ts')
 
   const command = new Deno.Command(Deno.execPath(), {
     args: ['run', '--allow-read', '--allow-write', mainFilePath, ...args],
