@@ -13,11 +13,11 @@ command.
 deno install --allow-write --allow-read https://deno.land/x/decor/src/decor.ts
 ```
 
-If you are a Homebrew user on macOS, you can install `decor` with the following
-command.
+If you are a [Homebrew](https://docs.brew.sh) user, you can install `decor` with
+the following command.
 
 ```
-TBD
+brew install tai2/brew/decor
 ```
 
 For other systems, you can download a binary from the
