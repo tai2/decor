@@ -20,51 +20,127 @@ function render(contentString: string, templateString: string): string {
   return renderHtml(contentString, renderer, templateDocument)
 }
 
+async function renderDefaultTemplate(options: { output?: string }) {
+  const writableStream = options.output
+    ? Deno.openSync(options.output, { write: true, create: true }).writable
+    : Deno.stdout.writable
+
+  await writableStream
+    .getWriter()
+    .write(new TextEncoder().encode(assets.defaultTemplate))
+}
+
+async function runOneshot(options: {
+  template?: string
+  input?: string
+  output?: string
+}) {
+  const templateString = options.template
+    ? Deno.readTextFileSync(options.template)
+    : assets.defaultTemplate
+
+  const contentString = options.input
+    ? Deno.readTextFileSync(options.input)
+    : assets.defaultContent
+
+  const outputString = render(contentString, templateString)
+
+  const writableStream = options.output
+    ? Deno.openSync(options.output, { write: true, create: true }).writable
+    : Deno.stdout.writable
+
+  await writableStream
+    .getWriter()
+    .write(new TextEncoder().encode(outputString))
+}
+
+function delay(t: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, t))
+}
+
+async function runWatch(options: {
+  template?: string
+  input?: string
+  output: string
+}) {
+  const watchTargets: string[] = []
+  if (options.template) {
+    watchTargets.push(options.template)
+  }
+  if (options.input) {
+    watchTargets.push(options.input)
+  }
+
+  let updatedPaths: string[] = []
+  ;(async () => {
+    const watcher = Deno.watchFs(watchTargets)
+    for await (const event of watcher) {
+      if (event.kind !== 'modify') {
+        continue
+      }
+
+      updatedPaths = [...updatedPaths, ...event.paths].filter(
+        (value, index, array) => {
+          return array.indexOf(value) === index
+        },
+      )
+    }
+  })()
+
+  for (;;) {
+    if (updatedPaths.length > 0) {
+      console.log('Updated:', updatedPaths)
+      await runOneshot(options)
+      updatedPaths = []
+    }
+    await delay(100)
+  }
+}
+
 async function main() {
   try {
     const {
       _: [input],
       ...options
     } = parse(Deno.args, {
-      string: ['help', 'template', 'output', 'show-default-template'],
+      boolean: ['help', 'show-default-template', 'watch'],
+      string: ['template', 'output'],
     })
+
+    if (options['show-default-template']) {
+      await renderDefaultTemplate({
+        output: options.output,
+      })
+      Deno.exit(0)
+    }
 
     if (
       options.help ||
       (input === undefined &&
-        options.template === undefined &&
-        options['show-default-template'] === undefined)
+        options.template === undefined)
     ) {
-      console.log(assets.helpText)
+      console.error(assets.helpText)
       Deno.exit(1)
     }
 
-    let outputString
-    if (options['show-default-template']) {
-      outputString = assets.defaultTemplate
+    if (options.watch) {
+      if (options.output === undefined) {
+        console.error('--output is required when --watch is specified')
+        Deno.exit(1)
+      }
+
+      await runWatch({
+        template: options.template,
+        input: input?.toString(),
+        output: options.output,
+      })
     } else {
-      let templateString = assets.defaultTemplate
-      if (options.template) {
-        templateString = Deno.readTextFileSync(options.template)
-      }
-
-      let contentString = assets.defaultContent
-      if (input !== undefined) {
-        contentString = Deno.readTextFileSync(input.toString())
-      }
-
-      outputString = render(contentString, templateString)
+      await runOneshot({
+        template: options.template,
+        input: input?.toString(),
+        output: options.output,
+      })
     }
-
-    let writableStream = Deno.stdout.writable
-    if (options.output) {
-      const file = Deno.openSync(options.output, { write: true, create: true })
-      writableStream = file.writable
-    }
-
-    await writableStream
-      .getWriter()
-      .write(new TextEncoder().encode(outputString))
   } catch (e) {
     console.error(e.message)
     Deno.exit(1)

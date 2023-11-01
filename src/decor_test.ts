@@ -93,17 +93,56 @@ Deno.test(
   },
 )
 
+Deno.test(
+  'decor writes the default template to a file when both --show-defualt-template and --output are specified',
+  () => {
+    // Create temp directory
+    const tempDirPath = Deno.makeTempDirSync({
+      prefix: 'decor_test_fixture',
+    })
+
+    // Prepare arguments
+    const outputPath = path.join(tempDirPath, 'output.html')
+
+    const { code } = runDecor(
+      '--show-default-template',
+      '--output',
+      outputPath,
+    )
+    assertEquals(code, 0)
+    assert(fs.existsSync(outputPath))
+
+    // Clean up temp directory
+    Deno.removeSync(tempDirPath, { recursive: true })
+  },
+)
+
 Deno.test('decor shows help text when --help is specified', () => {
-  const { code, stdout } = runDecor('--help')
+  const { code, stderr } = runDecor('--help')
   assertEquals(code, 1)
-  assertStringIncludes(new TextDecoder().decode(stdout), 'Usage : decor')
+  assertStringIncludes(new TextDecoder().decode(stderr), 'Usage : decor')
 })
 
 Deno.test(
   'decor shows help text when neither content nor template is specified',
   () => {
-    const { code, stdout } = runDecor('--help')
+    const { code, stderr } = runDecor()
     assertEquals(code, 1)
-    assertStringIncludes(new TextDecoder().decode(stdout), 'Usage : decor')
+    assertStringIncludes(new TextDecoder().decode(stderr), 'Usage : decor')
+  },
+)
+
+Deno.test(
+  'decor raise an error when --watch is specified without --output',
+  () => {
+    const dirname = path.dirname(path.fromFileUrl(import.meta.url))
+    const inputPath = path.join(dirname, '../contents/default_content.md')
+
+    const { code, stderr } = runDecor('--watch', inputPath)
+    assertEquals(code, 1)
+    assertStringIncludes(
+      new TextDecoder().decode(stderr),
+      '--output is required when --watch is specified',
+    )
   },
 )
