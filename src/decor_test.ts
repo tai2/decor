@@ -5,15 +5,15 @@ import {
 } from './deps/std/assert.ts'
 import * as path from './deps/std/path.ts'
 import * as fs from './deps/std/fs.ts'
+import { delay } from './deps/std/async.ts'
 
-function runDecor(...args: string[]): Deno.CommandOutput {
+function decor(...args: string[]): Deno.Command {
   const dirname = path.dirname(path.fromFileUrl(import.meta.url))
   const mainFilePath = path.join(dirname, 'decor.ts')
 
-  const command = new Deno.Command(Deno.execPath(), {
+  return new Deno.Command(Deno.execPath(), {
     args: ['run', '--allow-read', '--allow-write', mainFilePath, ...args],
   })
-  return command.outputSync()
 }
 
 Deno.test('decor emits output to the standard output', () => {
@@ -23,7 +23,7 @@ Deno.test('decor emits output to the standard output', () => {
     '../contents/default_content.md',
   )
 
-  const { code, stdout } = runDecor(defaultContentPath)
+  const { code, stdout } = decor(defaultContentPath).outputSync()
   assertEquals(code, 0)
   assertStringIncludes(
     new TextDecoder().decode(stdout),
@@ -40,7 +40,7 @@ Deno.test(
       '../contents/default_content.md',
     )
 
-    const { code, stdout } = runDecor(defaultContentPath)
+    const { code, stdout } = decor(defaultContentPath).outputSync()
     assertEquals(code, 0)
     assertStringIncludes(
       new TextDecoder().decode(stdout),
@@ -50,7 +50,7 @@ Deno.test(
 )
 
 Deno.test('When no template file exists, decor raises an error', () => {
-  const { code, stderr } = runDecor('--template', 'nonexistent.html')
+  const { code, stderr } = decor('--template', 'nonexistent.html').outputSync()
   assertEquals(code, 1)
   assertStringIncludes(
     new TextDecoder().decode(stderr),
@@ -72,7 +72,7 @@ Deno.test(
     const inputPath = path.join(dirname, '../contents/default_content.md')
 
     // Run decor
-    const { code } = runDecor(inputPath, '--output', outputPath)
+    const { code } = decor(inputPath, '--output', outputPath).outputSync()
     assertEquals(code, 0)
     assert(fs.existsSync(outputPath))
 
@@ -84,7 +84,7 @@ Deno.test(
 Deno.test(
   'decor emits the default template when --show-defualt-template is specified',
   () => {
-    const { code, stdout } = runDecor('--show-default-template')
+    const { code, stdout } = decor('--show-default-template').outputSync()
     assertEquals(code, 0)
     assertStringIncludes(
       new TextDecoder().decode(stdout),
@@ -104,11 +104,12 @@ Deno.test(
     // Prepare arguments
     const outputPath = path.join(tempDirPath, 'output.html')
 
-    const { code } = runDecor(
+    // Run decor
+    const { code } = decor(
       '--show-default-template',
       '--output',
       outputPath,
-    )
+    ).outputSync()
     assertEquals(code, 0)
     assert(fs.existsSync(outputPath))
 
@@ -118,7 +119,7 @@ Deno.test(
 )
 
 Deno.test('decor shows help text when --help is specified', () => {
-  const { code, stderr } = runDecor('--help')
+  const { code, stderr } = decor('--help').outputSync()
   assertEquals(code, 1)
   assertStringIncludes(new TextDecoder().decode(stderr), 'Usage : decor')
 })
@@ -126,9 +127,56 @@ Deno.test('decor shows help text when --help is specified', () => {
 Deno.test(
   'decor shows help text when neither content nor template is specified',
   () => {
-    const { code, stderr } = runDecor()
+    const { code, stderr } = decor().outputSync()
     assertEquals(code, 1)
     assertStringIncludes(new TextDecoder().decode(stderr), 'Usage : decor')
+  },
+)
+
+Deno.test(
+  'decor detects updates of the input file when --watch is specified',
+  async () => {
+    // Create temp directory
+    const tempDirPath = Deno.makeTempDirSync({
+      prefix: 'decor_test_fixture',
+    })
+
+    // Prepare arguments
+    const outputPath = path.join(tempDirPath, 'output.html')
+
+    const dirname = path.dirname(path.fromFileUrl(import.meta.url))
+    const inputPath = path.join(dirname, '../contents/default_content.md')
+    const copiedInputPath = path.join(tempDirPath, 'input.md')
+    Deno.copyFileSync(inputPath, copiedInputPath)
+
+    // Run decor
+    const process = decor(
+      '--watch',
+      copiedInputPath,
+      '--output',
+      outputPath,
+    ).spawn()
+
+    // Update the watched file
+    Deno.writeTextFileSync(
+      copiedInputPath,
+      '# A new section appended in tests\n',
+    )
+
+    // Terminate the process
+    await delay(100)
+    process.kill('SIGINT')
+    await process.output()
+
+    // Validation
+    const outputContent = Deno.readTextFileSync(outputPath)
+    assertStringIncludes(
+      outputContent,
+      'A new section appended in tests',
+    )
+
+    // Clean up temp directory
+    Deno.removeSync(tempDirPath, { recursive: true })
   },
 )
 
@@ -138,7 +186,7 @@ Deno.test(
     const dirname = path.dirname(path.fromFileUrl(import.meta.url))
     const inputPath = path.join(dirname, '../contents/default_content.md')
 
-    const { code, stderr } = runDecor('--watch', inputPath)
+    const { code, stderr } = decor('--watch', inputPath).outputSync()
     assertEquals(code, 1)
     assertStringIncludes(
       new TextDecoder().decode(stderr),

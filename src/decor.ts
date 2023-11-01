@@ -1,4 +1,5 @@
 import { parse } from './deps/std/flags.ts'
+import { delay } from './deps/std/async.ts'
 import { DOMParser } from './deps/deno-dom.ts'
 import { extractTemplate } from './extract_template.ts'
 import { templateRenderer } from './template_renderer.ts'
@@ -54,10 +55,6 @@ async function runOneshot(options: {
     .write(new TextEncoder().encode(outputString))
 }
 
-function delay(t: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, t))
-}
-
 async function runWatch(options: {
   template?: string
   input?: string
@@ -87,13 +84,16 @@ async function runWatch(options: {
     }
   })()
 
+  await runOneshot(options)
+
   for (;;) {
+    await delay(100)
+
     if (updatedPaths.length > 0) {
       console.log('Updated:', updatedPaths)
       await runOneshot(options)
       updatedPaths = []
     }
-    await delay(100)
   }
 }
 
