@@ -1,5 +1,5 @@
 import { parse } from './deps/std/flags.ts'
-import { delay } from './deps/std/async.ts'
+import { debounce, delay } from './deps/std/async.ts'
 import { DOMParser } from './deps/deno-dom.ts'
 import { extractTemplate } from './extract_template.ts'
 import { templateRenderer } from './template_renderer.ts'
@@ -88,32 +88,22 @@ async function runWatch(options: {
     watchTargets.push(options.input)
   }
 
-  let updatedPaths: string[] = []
-  ;(async () => {
-    const watcher = Deno.watchFs(watchTargets)
-    for await (const event of watcher) {
-      if (event.kind !== 'modify') {
-        continue
-      }
-
-      updatedPaths = [...updatedPaths, ...event.paths].filter(
-        (value, index, array) => {
-          return array.indexOf(value) === index
-        },
-      )
-    }
-  })()
-
   await runOneshot(options)
 
-  for (;;) {
-    await delay(100)
+  const runOneshotDebounced = debounce((event: Deno.FsEvent) => {
+    console.log('Updated:', event.paths)
+    runOneshot(options).catch((e) => {
+      console.error(e.message)
+    })
+  }, 100)
 
-    if (updatedPaths.length > 0) {
-      console.log('Updated:', updatedPaths)
-      await runOneshot(options)
-      updatedPaths = []
+  const watcher = Deno.watchFs(watchTargets)
+  for await (const event of watcher) {
+    if (event.kind !== 'modify') {
+      continue
     }
+
+    runOneshotDebounced(event)
   }
 }
 
