@@ -5,7 +5,7 @@ import {
 } from './deps/std/assert.ts'
 import * as path from './deps/std/path.ts'
 import * as fs from './deps/std/fs.ts'
-import { delay } from './deps/std/async.ts'
+import { deadline, delay } from './deps/std/async.ts'
 
 function decor(...args: string[]): Deno.Command {
   const dirname = path.dirname(path.fromFileUrl(import.meta.url))
@@ -133,67 +133,59 @@ Deno.test(
   },
 )
 
-// Deno.watchFs doesn't work on CI. It seems that it's because of the issue of Docker.
-// https://github.com/denoland/deno/issues/14684
-//
-// When I tried the --watch option on an Intel Linux container inside my Apple Silicon, it raised
-// the "Function not implemented" error. And, I also tried macos-13 and windows-latest on GitHub
-// but all of them failed too.
-//
-// Let's skip this test case on CI for now and revisit it when the issue is resolved.
-if (Deno.env.get('CI')) {
-  Deno.test(
-    'decor detects updates of the input file when --watch is specified',
-    async () => {
-      // Create temp directory
-      const tempDirPath = Deno.makeTempDirSync({
-        prefix: 'decor_test_fixture',
-      })
+Deno.test(
+  'decor detects updates of the input file when --watch is specified',
+  async () => {
+    // Create temp directory
+    const tempDirPath = Deno.makeTempDirSync({
+      prefix: 'decor_test_fixture',
+    })
 
-      // Prepare arguments
-      const outputPath = path.join(tempDirPath, 'output.html')
+    // Prepare arguments
+    const outputPath = path.join(tempDirPath, 'output.html')
 
-      const dirname = path.dirname(path.fromFileUrl(import.meta.url))
-      const inputPath = path.join(dirname, '../contents/default_content.md')
-      const copiedInputPath = path.join(tempDirPath, 'input.md')
-      Deno.copyFileSync(inputPath, copiedInputPath)
+    const dirname = path.dirname(path.fromFileUrl(import.meta.url))
+    const inputPath = path.join(dirname, '../contents/default_content.md')
+    const copiedInputPath = path.join(tempDirPath, 'input.md')
+    Deno.copyFileSync(inputPath, copiedInputPath)
 
-      // Run decor
-      const process = decor(
-        '--watch',
-        copiedInputPath,
-        '--output',
-        outputPath,
-      ).spawn()
+    // Run decor
+    const process = decor(
+      '--watch',
+      copiedInputPath,
+      '--output',
+      outputPath,
+    ).spawn()
 
-      // Wait for the process gets ready and the first output is emitted
-      await delay(500)
+    // Make sure the first output is emitted
+    while (!fs.existsSync(outputPath)) {
+      await delay(100)
+    }
 
-      // Update the watched file
-      Deno.writeTextFileSync(
-        copiedInputPath,
-        '# A new section appended in tests\n',
-      )
+    // Update the watched file
+    Deno.writeTextFileSync(
+      copiedInputPath,
+      '# A new section appended in tests\n',
+    )
 
-      // Wait for the output updated
-      await delay(500)
+    // Wait for the output updated
+    await delay(500)
 
-      // Validation
-      const outputContent = Deno.readTextFileSync(outputPath)
-      assertStringIncludes(
-        outputContent,
-        'A new section appended in tests',
-      )
+    // Validation
+    const outputContent = Deno.readTextFileSync(outputPath)
+    assertStringIncludes(
+      outputContent,
+      'A new section appended in tests',
+    )
 
-      // Terminate the process
-      process.kill('SIGINT')
-      await process.output()
+    // Terminate the process
+    process.kill('SIGINT')
+    await process.output()
 
-      // Clean up temp directory
-      Deno.removeSync(tempDirPath, { recursive: true })
-    },
-  )
-}
+    // Clean up temp directory
+    Deno.removeSync(tempDirPath, { recursive: true })
+  },
+)
 
 Deno.test(
   'decor raise an error when --watch is specified without --output',
