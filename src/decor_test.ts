@@ -162,6 +162,13 @@ Deno.test(
       await delay(100)
     }
 
+    // Validation
+    const outputBeforeUpdate = Deno.readTextFileSync(outputPath)
+    assertEquals(
+      outputBeforeUpdate.indexOf('A new section appended in tests'),
+      -1,
+    )
+
     // Update the watched file
     Deno.writeTextFileSync(
       copiedInputPath,
@@ -172,9 +179,9 @@ Deno.test(
     await delay(500)
 
     // Validation
-    const outputContent = Deno.readTextFileSync(outputPath)
+    const outputAfterUpdate = Deno.readTextFileSync(outputPath)
     assertStringIncludes(
-      outputContent,
+      outputAfterUpdate,
       'A new section appended in tests',
     )
 
