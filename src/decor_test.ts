@@ -167,7 +167,7 @@ if (Deno.env.get('CI')) {
       ).spawn()
 
       // Wait for the process gets ready and the first output is emitted
-      await delay(50)
+      await delay(500)
 
       // Update the watched file
       Deno.writeTextFileSync(
@@ -176,7 +176,7 @@ if (Deno.env.get('CI')) {
       )
 
       // Wait for the output updated
-      await delay(100)
+      await delay(500)
 
       // Validation
       const outputContent = Deno.readTextFileSync(outputPath)
