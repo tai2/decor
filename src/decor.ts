@@ -22,13 +22,21 @@ function render(contentString: string, templateString: string): string {
 }
 
 async function renderDefaultTemplate(options: { output?: string }) {
-  const writableStream = options.output
-    ? Deno.openSync(options.output, { write: true, create: true }).writable
-    : Deno.stdout.writable
+  let file, writableStream
+  if (options.output) {
+    file = Deno.openSync(options.output, { write: true, create: true })
+    writableStream = file.writable
+  } else {
+    writableStream = Deno.stdout.writable
+  }
 
   await writableStream
     .getWriter()
     .write(new TextEncoder().encode(assets.defaultTemplate))
+
+  if (file) {
+    await file.close()
+  }
 }
 
 async function runOneshot(options: {
@@ -46,13 +54,21 @@ async function runOneshot(options: {
 
   const outputString = render(contentString, templateString)
 
-  const writableStream = options.output
-    ? Deno.openSync(options.output, { write: true, create: true }).writable
-    : Deno.stdout.writable
+  let file, writableStream
+  if (options.output) {
+    file = Deno.openSync(options.output, { write: true, create: true })
+    writableStream = file.writable
+  } else {
+    writableStream = Deno.stdout.writable
+  }
 
   await writableStream
     .getWriter()
     .write(new TextEncoder().encode(outputString))
+
+  if (file) {
+    await file.close()
+  }
 }
 
 async function runWatch(options: {
