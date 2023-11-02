@@ -1,5 +1,5 @@
 import { parse } from './deps/std/flags.ts'
-import { debounce, delay } from './deps/std/async.ts'
+import { debounce } from './deps/std/async.ts'
 import { DOMParser } from './deps/deno-dom.ts'
 import { extractTemplate } from './extract_template.ts'
 import { templateRenderer } from './template_renderer.ts'
