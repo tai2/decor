@@ -141,7 +141,7 @@ Deno.test(
 // but all of them failed too.
 //
 // Let's skip this test case on CI for now and revisit it when the issue is resolved.
-if (!Deno.env.get('CI')) {
+if (Deno.env.get('CI')) {
   Deno.test(
     'decor detects updates of the input file when --watch is specified',
     async () => {
