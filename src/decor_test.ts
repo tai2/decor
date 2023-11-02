@@ -166,6 +166,9 @@ if (!Deno.env.get('CI')) {
         outputPath,
       ).spawn()
 
+      // Wait for the process gets ready and the first output is emitted
+      await delay(50)
+
       // Update the watched file
       Deno.writeTextFileSync(
         copiedInputPath,
