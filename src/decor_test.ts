@@ -163,10 +163,8 @@ Deno.test(
       '# A new section appended in tests\n',
     )
 
-    // Terminate the process
+    // Wait for the output updated
     await delay(100)
-    process.kill('SIGINT')
-    await process.output()
 
     // Validation
     const outputContent = Deno.readTextFileSync(outputPath)
@@ -174,6 +172,10 @@ Deno.test(
       outputContent,
       'A new section appended in tests',
     )
+
+    // Terminate the process
+    process.kill('SIGINT')
+    await process.output()
 
     // Clean up temp directory
     Deno.removeSync(tempDirPath, { recursive: true })
