@@ -5,7 +5,7 @@ import {
 } from './deps/std/assert.ts'
 import * as path from './deps/std/path.ts'
 import * as fs from './deps/std/fs.ts'
-import { deadline, delay } from './deps/std/async.ts'
+import { delay } from './deps/std/async.ts'
 
 function decor(...args: string[]): Deno.Command {
   const dirname = path.dirname(path.fromFileUrl(import.meta.url))
