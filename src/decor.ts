@@ -56,7 +56,11 @@ async function runOneshot(options: {
 
   let file, writableStream
   if (options.output) {
-    file = Deno.openSync(options.output, { write: true, create: true })
+    file = Deno.openSync(options.output, {
+      write: true,
+      create: true,
+      truncate: true,
+    })
     writableStream = file.writable
   } else {
     writableStream = Deno.stdout.writable
