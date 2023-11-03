@@ -2,7 +2,7 @@
   "tasks": {
     "build_assets": "deno run --allow-read --allow-write src/build_assets.ts",
     "update_cache": "deno cache --lock-write src/*.ts",
-    "test": "deno test --allow-read --allow-write --allow-run --allow-env"
+    "test": "deno test --allow-read --allow-write --allow-run"
   },
   "test": {
     "include": [

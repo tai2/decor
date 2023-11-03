@@ -1,15 +1,10 @@
-import * as path from './deps/std/path.ts'
-import { assertThrows } from './deps/std/assert.ts'
+import { assertEquals, assertThrows } from './deps/std/assert.ts'
 import { DOMParser, HTMLDocument } from './deps/deno-dom.ts'
-import { extractTemplate } from './extract_template.ts'
+import { extractPartialTemplate, extractTemplate } from './extract_template.ts'
+import assets from './assets.json' assert { type: 'json' }
 
 function parseDefaultTemplate(): HTMLDocument {
-  const dirname = path.dirname(path.fromFileUrl(import.meta.url))
-  const templateString = Deno.readTextFileSync(
-    path.join(dirname, '../contents/default_template.html'),
-  )
-
-  return new DOMParser().parseFromString(templateString, 'text/html')!
+  return new DOMParser().parseFromString(assets.defaultTemplate, 'text/html')!
 }
 
 Deno.test('default template contains all necessary elements', () => {
@@ -17,7 +12,7 @@ Deno.test('default template contains all necessary elements', () => {
   extractTemplate(parseDefaultTemplate())
 })
 
-Deno.test('`createTemplate` reports lacking elements', () => {
+Deno.test('`extractTemplate` reports lacking elements', () => {
   const templateDocument = parseDefaultTemplate()
 
   // Remove some elements
@@ -37,4 +32,23 @@ Deno.test('`createTemplate` reports lacking elements', () => {
     Error,
     'Missing elements in template: link,image',
   )
+})
+
+Deno.test('`extractPartialTemplate` allows incomplete template', () => {
+  const templateDocument = parseDefaultTemplate()
+
+  // Remove some elements
+  const linkElement = templateDocument.querySelector(
+    '[data-decor-element=link]',
+  )
+  linkElement?.parentElement?.removeChild(linkElement)
+  const imageElement = templateDocument.querySelector(
+    '[data-decor-element=image]',
+  )
+  imageElement?.parentElement?.removeChild(imageElement)
+
+  const template = extractPartialTemplate(templateDocument)
+
+  assertEquals(template.link, null)
+  assertEquals(template.image, null)
 })
