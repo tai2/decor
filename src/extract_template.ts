@@ -1,4 +1,4 @@
-import { HTMLDocument } from './deps/deno-dom.ts'
+import { DOMParser, HTMLDocument } from './deps/deno-dom.ts'
 import { PartialTemplate, Template } from './template.ts'
 
 export function extractPartialTemplate(
@@ -45,6 +45,25 @@ export function extractPartialTemplate(
   return template
 }
 
+export function parsePartialTemplate(
+  templateString: string,
+): [HTMLDocument, PartialTemplate] {
+  const templateDocument = new DOMParser().parseFromString(
+    templateString,
+    'text/html',
+  )
+  if (!templateDocument) {
+    throw new Error('Failed to parse template')
+  }
+
+  const template = extractPartialTemplate(templateDocument)
+
+  // Discard the content of the body since we are no longer interested in it.
+  templateDocument.body.innerHTML = ''
+
+  return [templateDocument, template]
+}
+
 export function extractTemplate(
   templateDocument: HTMLDocument,
 ): Template {
@@ -62,4 +81,23 @@ export function extractTemplate(
   }
 
   return template as Template
+}
+
+export function parseTemplate(
+  templateString: string,
+): [HTMLDocument, Template] {
+  const templateDocument = new DOMParser().parseFromString(
+    templateString,
+    'text/html',
+  )
+  if (!templateDocument) {
+    throw new Error('Failed to parse template')
+  }
+
+  const template = extractTemplate(templateDocument)
+
+  // Discard the content of the body since we are no longer interested in it.
+  templateDocument.body.innerHTML = ''
+
+  return [templateDocument, template]
 }

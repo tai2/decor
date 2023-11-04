@@ -10,6 +10,8 @@ export function renderHtml(
 ): string {
   const tokens = marked.lexer(markdown)
   const output = Parser.parse(renderer, tokens)
-  templateDocument.body.innerHTML = output
+  // Due to a bug of deno-dom, tempalteDocument.body becomes null when the document is cloned with
+  //  `cloneNode(true)`. So we instead use `querySelector`. Let's fix this when the bug is fixed.
+  templateDocument.querySelector('body')!.innerHTML = output
   return '<!DOCTYPE html>\n' + templateDocument.documentElement?.outerHTML
 }

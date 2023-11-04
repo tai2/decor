@@ -1,25 +1,11 @@
 import { parse } from './deps/std/flags.ts'
 import { debounce } from './deps/std/async.ts'
-import { DOMParser } from './deps/deno-dom.ts'
-import { extractTemplate } from './extract_template.ts'
+import { HTMLDocument } from './deps/deno-dom.ts'
+import { PartialTemplate, Template } from './template.ts'
+import { parsePartialTemplate, parseTemplate } from './extract_template.ts'
 import { templateRenderer } from './template_renderer.ts'
 import { renderHtml } from './render_html.ts'
 import assets from './assets.json' assert { type: 'json' }
-
-function render(contentString: string, templateString: string): string {
-  const templateDocument = new DOMParser().parseFromString(
-    templateString,
-    'text/html',
-  )
-  if (!templateDocument) {
-    throw new Error('Failed to parse template')
-  }
-
-  const template = extractTemplate(templateDocument)
-  const renderer = templateRenderer(template)
-
-  return renderHtml(contentString, renderer, templateDocument)
-}
 
 async function renderDefaultTemplate(options: { output?: string }) {
   let file, writableStream
@@ -43,17 +29,43 @@ async function runOneshot(options: {
   template?: string
   input?: string
   output?: string
+  defaultTemplate: [HTMLDocument, Template]
 }) {
-  const templateString = options.template
-    ? Deno.readTextFileSync(options.template)
-    : assets.defaultTemplate
+  // Prepare the template
+  const [defaultHtmlDocument, defaultTemplate] = options.defaultTemplate
+
+  let template: Template, document: HTMLDocument
+  if (options.template) {
+    // Fill the missing elements with the default template.
+    const templateString = Deno.readTextFileSync(options.template)
+    const [templateDocument, partialTemplate] = parsePartialTemplate(
+      templateString,
+    )
+    for (
+      const key of Object.keys(partialTemplate) as Array<keyof PartialTemplate>
+    ) {
+      if (!partialTemplate[key]) {
+        partialTemplate[key] = defaultTemplate[key]
+      }
+    }
+    template = partialTemplate as Template
+    document = templateDocument
+  } else {
+    // Use the default template but clone the document so that we can reuse the original data.
+    template = defaultTemplate
+    document = defaultHtmlDocument.cloneNode(true) as HTMLDocument
+  }
+
+  // Execute rendering
+  const renderer = templateRenderer(template)
 
   const contentString = options.input
     ? Deno.readTextFileSync(options.input)
     : assets.defaultContent
 
-  const outputString = render(contentString, templateString)
+  const outputString = renderHtml(contentString, renderer, document)
 
+  // Write the output
   let file, writableStream
   if (options.output) {
     file = Deno.openSync(options.output, {
@@ -79,6 +91,7 @@ async function runWatch(options: {
   template?: string
   input?: string
   output: string
+  defaultTemplate: [HTMLDocument, Template]
 }) {
   const watchTargets: string[] = []
   if (options.template) {
@@ -133,6 +146,9 @@ async function main() {
       Deno.exit(1)
     }
 
+    const defaultTemplate = parseTemplate(
+      assets.defaultTemplate,
+    )
     if (options.watch) {
       if (options.output === undefined) {
         console.error('--output is required when --watch is specified')
@@ -143,12 +159,14 @@ async function main() {
         template: options.template,
         input: input?.toString(),
         output: options.output,
+        defaultTemplate,
       })
     } else {
       await runOneshot({
         template: options.template,
         input: input?.toString(),
         output: options.output,
+        defaultTemplate,
       })
     }
   } catch (e) {
