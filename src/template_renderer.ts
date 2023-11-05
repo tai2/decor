@@ -1,4 +1,4 @@
-import { extname } from './deps/std/url.ts'
+import { extname } from './deps/std/path.ts'
 import { contentType } from './deps/std/media_types.ts'
 import { Element } from './deps/deno-dom.ts'
 import { cleanUrl, escape } from './deps/marked.ts'

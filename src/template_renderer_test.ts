@@ -593,6 +593,23 @@ Deno.test(
 )
 
 Deno.test(
+  '`templateRenderer.image` can receive and render relative image path',
+  () => {
+    const imageTemplate = parseDomFragment(
+      `<img data-decor-attribute-src="url" data-decor-attribute-title="title" data-decor-attribute-alt="description">`,
+    ).children[0]
+
+    assertEquals(
+      templateRenderer({
+        ...testTemplate,
+        image: imageTemplate,
+      }).image('a.jpeg', 'title text', 'description text'),
+      `<img data-decor-attribute-src="url" data-decor-attribute-title="title" data-decor-attribute-alt="description" src="a.jpeg" title="title text" alt="description text">`,
+    )
+  },
+)
+
+Deno.test(
   '`templateRenderer.image` renders received parameters with video template when the file extention is a video one',
   () => {
     const videoTemplate = parseDomFragment(
