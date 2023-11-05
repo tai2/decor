@@ -260,6 +260,20 @@ Deno.test('`image` callback receives arguments (href, title, text)', () => {
   })
 })
 
+Deno.test('`image` can handle relative path', () => {
+  const renderer = testRenderer()
+  const imageSpy = spy(renderer, 'image')
+
+  Parser.parse(
+    renderer,
+    marked.lexer('![Hello, World!](image.jpg "title")'),
+  )
+
+  assertSpyCall(imageSpy, 0, {
+    args: ['image.jpg', 'title', 'Hello, World!'],
+  })
+})
+
 Deno.test('`text` callback receives arguments (text)', () => {
   const renderer = testRenderer()
   const textSpy = spy(renderer, 'text')
