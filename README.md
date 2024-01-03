@@ -44,6 +44,7 @@ templates are described in the following sections.
   output.
 - `--show-default-template` Emit the default template. You can use it as a
   starting point of your own template.
+- `--parameters` Inject parameters from a JSON file
 
 # Template Structure
 
@@ -227,6 +228,52 @@ default mappings of the `paragraph`and `image` elements look like these.
   data-decor-attribute-alt="description"
   data-decor-attribute-title="title"
 />
+```
+
+## Parameter Replacement (WIP)
+
+With content and attribute specifiers, you can reference a special key name
+starting with `param:`. When it is specified, decor tries to resolve the name
+with a value from a JSON file specified with `--paramaters`. The JSON parameters
+are simple key value pairs like this.
+
+```json
+{
+  "title": "This is a page title",
+  "spellcheck": "true"
+}
+```
+
+Parameter replacement happenes before normal conversion steps. The content of
+the `title` element and `spellcheck` attributes of heading elements will be
+replaced with the values in a JSON file in the example below
+
+```html
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="/dist/output.css" rel="stylesheet" />
+    <title data-decor-content="param:title">Page title</title>
+  </head>
+  <body>
+    <h1
+      data-decor-element="headding1"
+      class="text-3xl font-bold underline"
+      data-decor-attribute-spellcheck="param:spellcheck"
+    >
+      Primary Headding
+    </h1>
+    <h2
+      data-decor-element="headding2"
+      class="text-2xl font-bold underline"
+      data-decor-attribute-spellcheck="param:spellcheck"
+    >
+      Secondary Headding
+    </h2>
+  </body>
+</html>
 ```
 
 # Reviewing Template
