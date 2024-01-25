@@ -114,7 +114,7 @@ function applyParameters(
 }
 
 export function templateRenderer(template: Template): Renderer {
-  // CSS Selectors doesn't support wildcard attribute names and deno-dom doesn't support
+  // CSS selectors doesn't support wildcard attribute names and deno-dom doesn't support
   // XPath query so we need to traverse the DOM tree to collect all attribute keys.
   // We looked for other libraries that support XPath query against XML but I couldn't find any.
   //
