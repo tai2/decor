@@ -36,11 +36,12 @@ async function runOneshot(options: {
 
   let template: Template, document: HTMLDocument
   if (options.template) {
-    // Fill the missing elements with the default template.
     const templateString = Deno.readTextFileSync(options.template)
     const [templateDocument, partialTemplate] = parsePartialTemplate(
       templateString,
     )
+
+    // Fill the missing elements with the default template.
     for (
       const key of Object.keys(partialTemplate) as Array<keyof PartialTemplate>
     ) {
@@ -48,6 +49,7 @@ async function runOneshot(options: {
         partialTemplate[key] = defaultTemplate[key]
       }
     }
+
     template = partialTemplate as Template
     document = templateDocument
   } else {
