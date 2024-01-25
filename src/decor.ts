@@ -1,4 +1,4 @@
-import { parse } from './deps/std/flags.ts'
+import { parseArgs } from './deps/std/cli.ts'
 import { debounce } from './deps/std/async.ts'
 import { HTMLDocument } from './deps/deno-dom.ts'
 import { PartialTemplate, Template } from './template.ts'
@@ -125,7 +125,7 @@ async function main() {
     const {
       _: [input],
       ...options
-    } = parse(Deno.args, {
+    } = parseArgs(Deno.args, {
       boolean: ['help', 'show-default-template', 'watch'],
       string: ['template', 'output'],
     })
