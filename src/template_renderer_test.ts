@@ -43,7 +43,7 @@ function parseDomFragment(text: string): Element {
 }
 
 Deno.test(
-  '`getAttributeKeys` returns all attribute keys start with \'data-decor-attribute-\' in the template',
+  "`getAttributeKeys` returns all attribute keys start with 'data-decor-attribute-' in the template",
   () => {
     const template = parseDomFragment(
       `<figure data-decor-element="image" data-decor-attribute-title="title" class="Figure">
@@ -220,7 +220,7 @@ Deno.test(
 )
 
 Deno.test(
-  '`templateRenderer.list` doesn\'t render start attribute when start is 1',
+  "`templateRenderer.list` doesn't render start attribute when start is 1",
   () => {
     const orderedListTemplate = parseDomFragment(
       `<ol data-decor-content="content" data-decor-attribute-start="start"><li>item</li></ol>`,
@@ -421,7 +421,7 @@ Deno.test(
 )
 
 Deno.test(
-  '`templateRenderer.tablecell` doesn\'t render `align` attribute when null is given',
+  "`templateRenderer.tablecell` doesn't render `align` attribute when null is given",
   () => {
     const tableRowCellTemplate = parseDomFragment(
       '<table><tr><td data-decor-content="content" data-decor-attribute-align="align">The quick brown fox jumps over the lazy dog.</td></tr></table>',
@@ -524,7 +524,7 @@ example
   )
 })
 
-Deno.test('`templateRenderer.link` omits title when it\'s not provided', () => {
+Deno.test("`templateRenderer.link` omits title when it's not provided", () => {
   const linkTemplate = parseDomFragment(
     `<a data-decor-attribute-href="url" data-decor-attribute-title="title" data-decor-content="content">
 example

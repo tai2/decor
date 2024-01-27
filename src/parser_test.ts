@@ -36,11 +36,11 @@ Deno.test(
 
     Parser.parse(
       renderer,
-      marked.lexer('```js\nconsole.log(\'Hello, World!\');\n```'),
+      marked.lexer("```js\nconsole.log('Hello, World!');\n```"),
     )
 
     assertSpyCall(codeSpy, 0, {
-      args: ['console.log(\'Hello, World!\');', 'js', false],
+      args: ["console.log('Hello, World!');", 'js', false],
     })
   },
 )
