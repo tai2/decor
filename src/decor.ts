@@ -9,7 +9,7 @@ import {
   replaceDocumentParameters,
   replaceTemplateParameters,
 } from './replace_parameters.ts'
-import assets from './assets.json' assert { type: 'json' }
+import assets from './assets.json' with { type: 'json' }
 
 async function renderDefaultTemplate(options: { output?: string }) {
   let file, writableStream

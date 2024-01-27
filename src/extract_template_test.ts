@@ -1,7 +1,7 @@
 import { assertEquals, assertThrows } from './deps/std/assert.ts'
 import { DOMParser, HTMLDocument } from './deps/deno-dom.ts'
 import { extractPartialTemplate, extractTemplate } from './extract_template.ts'
-import assets from './assets.json' assert { type: 'json' }
+import assets from './assets.json' with { type: 'json' }
 
 function parseDefaultTemplate(): HTMLDocument {
   return new DOMParser().parseFromString(assets.defaultTemplate, 'text/html')!

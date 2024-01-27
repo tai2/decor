@@ -3,7 +3,7 @@ import { DOMParser } from './deps/deno-dom.ts'
 import { extractTemplate } from './extract_template.ts'
 import { templateRenderer } from './template_renderer.ts'
 import { renderHtml } from './render_html.ts'
-import assets from './assets.json' assert { type: 'json' }
+import assets from './assets.json' with { type: 'json' }
 
 Deno.test(
   '`renderHtml` receives a markdown content and renders it as a HTML',
