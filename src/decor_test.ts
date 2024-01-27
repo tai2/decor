@@ -222,7 +222,7 @@ Deno.test('decor runs parameter replacement', () => {
     '../contents/parameters.json',
   )
 
-  const { code, stdout, stderr } = decor(
+  const { code, stdout } = decor(
     '--template',
     templatePath,
     '--parameters',
