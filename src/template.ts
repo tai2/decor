@@ -33,4 +33,36 @@ export type PartialTemplate = {
   hard_line_break: Element | null
 }
 
+export function createPartialTemplate(): PartialTemplate {
+  return {
+    heading1: null,
+    heading2: null,
+    heading3: null,
+    heading4: null,
+    heading5: null,
+    heading6: null,
+    thematic_break: null,
+    paragraph: null,
+    code_block: null,
+    block_quote: null,
+    table: null,
+    table_header: null,
+    table_header_cell: null,
+    table_row: null,
+    table_row_cell: null,
+    ordered_list: null,
+    ordered_list_item: null,
+    unordered_list: null,
+    unordered_list_item: null,
+    link: null,
+    image: null,
+    video: null,
+    code_span: null,
+    emphasis: null,
+    strong_emphasis: null,
+    strikethrough: null,
+    hard_line_break: null,
+  }
+}
+
 export type Template = SetNonNullable<PartialTemplate>

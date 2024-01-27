@@ -1,11 +1,13 @@
 import {
   assert,
   assertEquals,
+  assertExists,
   assertStringIncludes,
 } from './deps/std/assert.ts'
 import * as path from './deps/std/path.ts'
 import * as fs from './deps/std/fs.ts'
 import { delay } from './deps/std/async.ts'
+import { DOMParser } from './deps/deno-dom.ts'
 
 function decor(...args: string[]): Deno.Command {
   const dirname = path.dirname(path.fromFileUrl(import.meta.url))
@@ -208,3 +210,32 @@ Deno.test(
     )
   },
 )
+
+Deno.test('decor runs parameter replacement', () => {
+  const dirname = path.dirname(path.fromFileUrl(import.meta.url))
+  const templatePath = path.join(
+    dirname,
+    '../contents/template_with_parameter_replacement.html',
+  )
+  const parametersPath = path.join(
+    dirname,
+    '../contents/parameters.json',
+  )
+
+  const { code, stdout, stderr } = decor(
+    '--template',
+    templatePath,
+    '--parameters',
+    parametersPath,
+  ).outputSync()
+
+  assertEquals(code, 0)
+
+  const outputHtml = new TextDecoder().decode(stdout)
+  const document = new DOMParser().parseFromString(outputHtml, 'text/html')!
+  const title = document.querySelector('title')
+
+  assertExists(title)
+  assertEquals(title.getAttribute('id'), 'replaced ID')
+  assertEquals(title.innerHTML, 'replaced title')
+})

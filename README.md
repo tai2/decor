@@ -230,7 +230,7 @@ default mappings of the `paragraph`and `image` elements look like these.
 />
 ```
 
-## Parameter Replacement (WIP)
+## Parameter Replacement
 
 With content and attribute specifiers, you can reference a special key name
 starting with `param:`. When it is specified, decor tries to resolve the name

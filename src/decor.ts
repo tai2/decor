@@ -5,6 +5,10 @@ import { PartialTemplate, Template } from './template.ts'
 import { parsePartialTemplate, parseTemplate } from './extract_template.ts'
 import { templateRenderer } from './template_renderer.ts'
 import { renderHtml } from './render_html.ts'
+import {
+  replaceDocumentParameters,
+  replaceTemplateParameters,
+} from './replace_parameters.ts'
 import assets from './assets.json' assert { type: 'json' }
 
 async function renderDefaultTemplate(options: { output?: string }) {
@@ -30,6 +34,7 @@ async function runOneshot(options: {
   input?: string
   output?: string
   defaultTemplate: [HTMLDocument, Template]
+  parameters: Record<string, string>
 }) {
   // Prepare the template
   const [defaultHtmlDocument, defaultTemplate] = options.defaultTemplate
@@ -50,12 +55,15 @@ async function runOneshot(options: {
       }
     }
 
-    template = partialTemplate as Template
     document = templateDocument
+    template = partialTemplate as Template
+
+    replaceDocumentParameters(document, options.parameters)
+    replaceTemplateParameters(template, options.parameters)
   } else {
     // Use the default template but clone the document so that we can reuse the original data.
-    template = defaultTemplate
     document = defaultHtmlDocument.cloneNode(true) as HTMLDocument
+    template = defaultTemplate
   }
 
   // Execute rendering
@@ -94,6 +102,7 @@ async function runWatch(options: {
   input?: string
   output: string
   defaultTemplate: [HTMLDocument, Template]
+  parameters: Record<string, string>
 }) {
   const watchTargets: string[] = []
   if (options.template) {
@@ -129,7 +138,7 @@ async function main() {
       ...options
     } = parseArgs(Deno.args, {
       boolean: ['help', 'show-default-template', 'watch'],
-      string: ['template', 'output'],
+      string: ['template', 'output', 'parameters'],
     })
 
     if (options['show-default-template']) {
@@ -151,6 +160,18 @@ async function main() {
     const defaultTemplate = parseTemplate(
       assets.defaultTemplate,
     )
+
+    let parameters: Record<string, string>
+    if (options.parameters) {
+      const parametersString = Deno.readTextFileSync(options.parameters)
+      parameters = JSON.parse(parametersString)
+    } else {
+      parameters = {}
+    }
+
+    replaceDocumentParameters(defaultTemplate[0], parameters)
+    replaceTemplateParameters(defaultTemplate[1], parameters)
+
     if (options.watch) {
       if (options.output === undefined) {
         console.error('--output is required when --watch is specified')
@@ -162,6 +183,7 @@ async function main() {
         input: input?.toString(),
         output: options.output,
         defaultTemplate,
+        parameters,
       })
     } else {
       await runOneshot({
@@ -169,6 +191,7 @@ async function main() {
         input: input?.toString(),
         output: options.output,
         defaultTemplate,
+        parameters,
       })
     }
   } catch (e) {
