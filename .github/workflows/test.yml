@@ -2,7 +2,6 @@ name: Test Deno Module
 
 on:
   push:
-  pull_request:
 
 jobs:
   test:
@@ -10,7 +9,7 @@ jobs:
 
     strategy:
       matrix:
-        deno-version: ["${{ vars.DENO_VERSION }}"]
+        deno-version: ['${{ vars.DENO_VERSION }}']
 
     steps:
       - name: Git Checkout Deno Module
