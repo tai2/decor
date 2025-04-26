@@ -213,7 +213,7 @@ Deno.test(
 
 Deno.test('decor runs parameter replacement', () => {
   const dirname = path.dirname(path.fromFileUrl(import.meta.url))
-  const template  Path = path.join(
+  const templatePath = path.join(
     dirname,
     '../contents/template_with_parameter_replacement.html',
   )
