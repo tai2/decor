@@ -34,7 +34,7 @@ jobs:
       - name: Set commit status with pending
         uses: Sibz/github-status-action@v1
         with:
-          authToken: ${{ secrets.GITHUB_TOKEN }}
+          authToken: ${{ secrets.PAT_FOR_DECOR_UDD }}
           context: 'Basic tests'
           state: 'pending'
           sha: ${{ steps.commit.outputs.sha }}
@@ -46,7 +46,7 @@ jobs:
       - name: Set commit status with outcome
         uses: Sibz/github-status-action@v1
         with:
-          authToken: ${{ secrets.GITHUB_TOKEN }}
+          authToken: ${{ secrets.PAT_FOR_DECOR_UDD }}
           context: 'Basic tests'
           description: 'To run other CI actions close/reopen this PR'
           state: ${{ steps.test.outcome }}
