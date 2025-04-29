@@ -17,9 +17,10 @@ jobs:
         run: |
           deno run -A https://deno.land/x/udd/main.ts src/deps/*.ts src/deps/std/*.ts
       - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v5
+        uses: peter-evans/create-pull-request@v7
         id: pr
         with:
+          token: ${{ secrets.PAT_FOR_DECOR_UDD }}
           commit-message: 'Update dependencies'
           title: Update dependencies
           body: >
@@ -32,9 +33,9 @@ jobs:
         run: |
           echo "::set-output name=sha::$(git rev-parse HEAD)"
       - name: Set commit status with pending
-        uses: Sibz/github-status-action@v1
+        uses: guibranco/github-status-action-v2@latest
         with:
-          authToken: ${{ secrets.PAT_FOR_DECOR_UDD }}
+          authToken: ${{ secrets.GITHUB_TOKEN }}
           context: 'Basic tests'
           state: 'pending'
           sha: ${{ steps.commit.outputs.sha }}
@@ -44,9 +45,9 @@ jobs:
         run: |
           deno task test
       - name: Set commit status with outcome
-        uses: Sibz/github-status-action@v1
+        uses: guibranco/github-status-action-v2@latest
         with:
-          authToken: ${{ secrets.PAT_FOR_DECOR_UDD }}
+          authToken: ${{ secrets.GITHUB_TOKEN }}
           context: 'Basic tests'
           description: 'To run other CI actions close/reopen this PR'
           state: ${{ steps.test.outcome }}
